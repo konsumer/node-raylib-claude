@@ -10,7 +10,7 @@
     "generate:c": "node tools/gen_c.js",
     "generate:js": "node tools/gen_js.js",
     "generate": "run-p generate:c generate:js",
-    "start": "node example.js"
+    "start": "node examples/core_basic_window"
   },
   "repository": "RobLoach/node-raylib",
   "bugs": {
