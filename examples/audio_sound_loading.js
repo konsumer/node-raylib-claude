@@ -70,10 +70,6 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
 
         DrawText("Press SPACE to PLAY the WAV sound!", 200, 180, 20, LIGHTGRAY)
         DrawText("Press ENTER to PLAY the OGG sound!", 200, 220, 20, LIGHTGRAY)
-        
-        // Display a notice about the audio binding issue
-        DrawText("NOTE: Audio won't actually play due to binding limitations.", 150, 280, 20, RED)
-        DrawText("See CLAUDE.md or README.md for details.", 180, 310, 20, RED)
 
     EndDrawing()
     //----------------------------------------------------------------------------------

@@ -165,6 +165,18 @@ function generateStructs() {
         // Only use _from_js for structs we know about
         const fieldSanitizedType = sanitizeTypeName(field.type)
         structsCode += `        result.${field.name} = ${fieldSanitizedType}_from_js(env, prop);\n`
+      } else if (field.type.includes('*')) {
+        // For pointer fields in from_js
+        structsCode += `        // Handle pointer type ${field.type}\n`
+        structsCode += `        napi_valuetype valueType;\n`
+        structsCode += `        napi_typeof(env, prop, &valueType);\n`
+        structsCode += `        if (valueType == napi_number) {\n`
+        structsCode += `            double pointerValue;\n`
+        structsCode += `            napi_get_value_double(env, prop, &pointerValue);\n`
+        structsCode += `            result.${field.name} = (${field.type.replace('*', '').trim()}*)(uintptr_t)pointerValue;\n`
+        structsCode += `        } else {\n`
+        structsCode += `            result.${field.name} = NULL;\n`
+        structsCode += `        }\n`
       } else {
         structsCode += `        // TODO: Handle field type ${field.type}\n`
       }
@@ -178,6 +190,9 @@ function generateStructs() {
       } else if (field.type === 'bool') {
         structsCode += `        result.${field.name} = false;\n`
       } else if (field.type === 'char *' || field.type === 'const char *') {
+        structsCode += `        result.${field.name} = NULL;\n`
+      } else if (field.type.includes('*')) {
+        structsCode += `        // Set default NULL for pointer type ${field.type}\n`
         structsCode += `        result.${field.name} = NULL;\n`
       } else {
         structsCode += `        // TODO: Set default for ${field.type}\n`
@@ -215,6 +230,15 @@ function generateStructs() {
         // Only use _to_js for structs we know about
         const fieldSanitizedType = sanitizeTypeName(field.type)
         structsCode += `    prop = ${fieldSanitizedType}_to_js(env, data.${field.name});\n`
+      } else if (field.type.includes('*')) {
+        // For pointer fields in to_js
+        structsCode += `    // Handle pointer type ${field.type}\n`
+        structsCode += `    if (data.${field.name} != NULL) {\n`
+        structsCode += `        // Store the pointer as a double (JS Number)\n`
+        structsCode += `        napi_create_double(env, (double)(uintptr_t)data.${field.name}, &prop);\n`
+        structsCode += `    } else {\n`
+        structsCode += `        napi_get_null(env, &prop);\n`
+        structsCode += `    }\n`
       } else {
         structsCode += `    // TODO: Handle field type ${field.type}\n`
         structsCode += `    napi_get_null(env, &prop);\n`
@@ -268,23 +292,31 @@ function generateFunctions() {
   // Add special handling for void* type
   bindingsSource += `// Special handler for void* type\n`
   bindingsSource += `void* void_ptr_from_js(napi_env env, napi_value jsObj) {\n`
-  bindingsSource += `    // This is a placeholder that returns NULL\n`
+  bindingsSource += `    // Check if it's a number (pointer stored as double)\n`
+  bindingsSource += `    napi_valuetype valueType;\n`
+  bindingsSource += `    napi_typeof(env, jsObj, &valueType);\n`
+  bindingsSource += `    if (valueType == napi_number) {\n`
+  bindingsSource += `        double pointerValue;\n`
+  bindingsSource += `        napi_get_value_double(env, jsObj, &pointerValue);\n`
+  bindingsSource += `        return (void*)(uintptr_t)pointerValue;\n`
+  bindingsSource += `    }\n`
   bindingsSource += `    // In real implementation, you might want to handle Buffer objects\n`
   bindingsSource += `    return NULL;\n`
   bindingsSource += `}\n\n`
   bindingsSource += `napi_value void_ptr_to_js(napi_env env, void* data) {\n`
-  bindingsSource += `    // This is a placeholder that returns null\n`
   bindingsSource += `    napi_value result;\n`
-  bindingsSource += `    napi_get_null(env, &result);\n`
+  bindingsSource += `    if (data != NULL) {\n`
+  bindingsSource += `        // Store the pointer as a double (JS Number)\n`
+  bindingsSource += `        napi_create_double(env, (double)(uintptr_t)data, &result);\n`
+  bindingsSource += `    } else {\n`
+  bindingsSource += `        napi_get_null(env, &result);\n`
+  bindingsSource += `    }\n`
   bindingsSource += `    return result;\n`
   bindingsSource += `}\n\n`
   
-  // Add alias for void_from_js that was being called
+  // We only need the void_ptr_from_js function, not any alias
   bindingsSource += `// Special handler for functions needing void* returns\n`
-  bindingsSource += `typedef void* void_ptr;\n`
-  bindingsSource += `void_ptr void_from_js(napi_env env, napi_value jsObj) {\n`
-  bindingsSource += `    return void_ptr_from_js(env, jsObj);\n`
-  bindingsSource += `}\n\n`
+  bindingsSource += `typedef void* void_ptr;\n\n`
 
   raylibJson.functions.forEach((funcDef) => {
     const funcName = funcDef.name
@@ -385,8 +417,7 @@ function generateFunctions() {
         }
         // Handle void* pointers
         else if (type === 'void*' || type === 'const void*' || type === 'void *' || type === 'const void *') {
-          functionsCode += `    void_ptr ${sanitizedParamName}_value = void_ptr_from_js(env, args[${index}]);\n`;
-          functionsCode += `    ${type} ${sanitizedParamName} = ${sanitizedParamName}_value;\n\n`;
+          functionsCode += `    ${type} ${sanitizedParamName} = void_ptr_from_js(env, args[${index}]);\n\n`;
         }
         // Add a fallback for any types we don't handle specifically
         else {
@@ -523,8 +554,21 @@ napi_value Init(napi_env env, napi_value exports) {
   return moduleInit
 }
 
-// Generate the complete binding code
-const { functionsCode, functionDeclarations, functionRegistrations } = generateFunctions()
+// After generating the code, find and fix void_from_js references
+const { functionsCode: origFunctionsCode, functionDeclarations, functionRegistrations } = generateFunctions()
+
+// Fix all problematic code patterns
+let functionsCode = origFunctionsCode
+  // Fix the problematic patterns with void_from_js
+  .replace(/void ptr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* ptr = &ptr_value;/g, 
+      'void* ptr = void_ptr_from_js(env, args[0]);')
+  .replace(/void srcPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* srcPtr = &srcPtr_value;/g, 
+      'void* srcPtr = void_ptr_from_js(env, args[0]);')
+  .replace(/void dstPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* dstPtr = &dstPtr_value;/g, 
+      'void* dstPtr = void_ptr_from_js(env, args[0]);')
+  .replace(/void data_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* data = &data_value;/g, 
+      'void* data = void_ptr_from_js(env, args[1]);');
+
 bindingsSource += functionDeclarations + '\n'
 bindingsSource += generateEnums()
 bindingsSource += generateStructs()

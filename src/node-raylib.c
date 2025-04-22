@@ -117,23 +117,31 @@ napi_value AudioCallback_to_js(napi_env env, AudioCallback data);
 // Forward declarations for functions
 // Special handler for void* type
 void* void_ptr_from_js(napi_env env, napi_value jsObj) {
-    // This is a placeholder that returns NULL
+    // Check if it's a number (pointer stored as double)
+    napi_valuetype valueType;
+    napi_typeof(env, jsObj, &valueType);
+    if (valueType == napi_number) {
+        double pointerValue;
+        napi_get_value_double(env, jsObj, &pointerValue);
+        return (void*)(uintptr_t)pointerValue;
+    }
     // In real implementation, you might want to handle Buffer objects
     return NULL;
 }
 
 napi_value void_ptr_to_js(napi_env env, void* data) {
-    // This is a placeholder that returns null
     napi_value result;
-    napi_get_null(env, &result);
+    if (data != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data, &result);
+    } else {
+        napi_get_null(env, &result);
+    }
     return result;
 }
 
 // Special handler for functions needing void* returns
 typedef void* void_ptr;
-void_ptr void_from_js(napi_env env, napi_value jsObj) {
-    return void_ptr_from_js(env, jsObj);
-}
 
 napi_value BindNode_InitWindow(napi_env env, napi_callback_info info);
 napi_value BindNode_CloseWindow(napi_env env, napi_callback_info info);
@@ -2999,11 +3007,20 @@ Image Image_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "data", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "data", &prop);
-        // TODO: Handle field type void *
+        // Handle pointer type void *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.data = (void*)(uintptr_t)pointerValue;
+        } else {
+            result.data = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for void *
-        memset(&result.data, 0, sizeof(result.data));
+        // Set default NULL for pointer type void *
+        result.data = NULL;
     }
 
     // Get width
@@ -3055,8 +3072,13 @@ napi_value Image_to_js(napi_env env, Image data) {
     napi_value prop;
 
     // Set data
-    // TODO: Handle field type void *
-    napi_get_null(env, &prop);
+    // Handle pointer type void *
+    if (data.data != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.data, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "data", prop);
 
     // Set width
@@ -3462,22 +3484,40 @@ Font Font_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "recs", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "recs", &prop);
-        // TODO: Handle field type Rectangle *
+        // Handle pointer type Rectangle *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.recs = (Rectangle*)(uintptr_t)pointerValue;
+        } else {
+            result.recs = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Rectangle *
-        memset(&result.recs, 0, sizeof(result.recs));
+        // Set default NULL for pointer type Rectangle *
+        result.recs = NULL;
     }
 
     // Get glyphs
     napi_has_named_property(env, jsObj, "glyphs", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "glyphs", &prop);
-        // TODO: Handle field type GlyphInfo *
+        // Handle pointer type GlyphInfo *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.glyphs = (GlyphInfo*)(uintptr_t)pointerValue;
+        } else {
+            result.glyphs = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for GlyphInfo *
-        memset(&result.glyphs, 0, sizeof(result.glyphs));
+        // Set default NULL for pointer type GlyphInfo *
+        result.glyphs = NULL;
     }
 
     return result;
@@ -3506,13 +3546,23 @@ napi_value Font_to_js(napi_env env, Font data) {
     napi_set_named_property(env, jsObj, "texture", prop);
 
     // Set recs
-    // TODO: Handle field type Rectangle *
-    napi_get_null(env, &prop);
+    // Handle pointer type Rectangle *
+    if (data.recs != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.recs, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "recs", prop);
 
     // Set glyphs
-    // TODO: Handle field type GlyphInfo *
-    napi_get_null(env, &prop);
+    // Handle pointer type GlyphInfo *
+    if (data.glyphs != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.glyphs, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "glyphs", prop);
 
     return jsObj;
@@ -3716,132 +3766,240 @@ Mesh Mesh_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "vertices", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "vertices", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.vertices = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.vertices = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.vertices, 0, sizeof(result.vertices));
+        // Set default NULL for pointer type float *
+        result.vertices = NULL;
     }
 
     // Get texcoords
     napi_has_named_property(env, jsObj, "texcoords", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "texcoords", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.texcoords = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.texcoords = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.texcoords, 0, sizeof(result.texcoords));
+        // Set default NULL for pointer type float *
+        result.texcoords = NULL;
     }
 
     // Get texcoords2
     napi_has_named_property(env, jsObj, "texcoords2", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "texcoords2", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.texcoords2 = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.texcoords2 = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.texcoords2, 0, sizeof(result.texcoords2));
+        // Set default NULL for pointer type float *
+        result.texcoords2 = NULL;
     }
 
     // Get normals
     napi_has_named_property(env, jsObj, "normals", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "normals", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.normals = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.normals = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.normals, 0, sizeof(result.normals));
+        // Set default NULL for pointer type float *
+        result.normals = NULL;
     }
 
     // Get tangents
     napi_has_named_property(env, jsObj, "tangents", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "tangents", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.tangents = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.tangents = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.tangents, 0, sizeof(result.tangents));
+        // Set default NULL for pointer type float *
+        result.tangents = NULL;
     }
 
     // Get colors
     napi_has_named_property(env, jsObj, "colors", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "colors", &prop);
-        // TODO: Handle field type unsigned char *
+        // Handle pointer type unsigned char *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.colors = (unsigned char*)(uintptr_t)pointerValue;
+        } else {
+            result.colors = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for unsigned char *
-        memset(&result.colors, 0, sizeof(result.colors));
+        // Set default NULL for pointer type unsigned char *
+        result.colors = NULL;
     }
 
     // Get indices
     napi_has_named_property(env, jsObj, "indices", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "indices", &prop);
-        // TODO: Handle field type unsigned short *
+        // Handle pointer type unsigned short *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.indices = (unsigned short*)(uintptr_t)pointerValue;
+        } else {
+            result.indices = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for unsigned short *
-        memset(&result.indices, 0, sizeof(result.indices));
+        // Set default NULL for pointer type unsigned short *
+        result.indices = NULL;
     }
 
     // Get animVertices
     napi_has_named_property(env, jsObj, "animVertices", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "animVertices", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.animVertices = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.animVertices = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.animVertices, 0, sizeof(result.animVertices));
+        // Set default NULL for pointer type float *
+        result.animVertices = NULL;
     }
 
     // Get animNormals
     napi_has_named_property(env, jsObj, "animNormals", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "animNormals", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.animNormals = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.animNormals = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.animNormals, 0, sizeof(result.animNormals));
+        // Set default NULL for pointer type float *
+        result.animNormals = NULL;
     }
 
     // Get boneIds
     napi_has_named_property(env, jsObj, "boneIds", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "boneIds", &prop);
-        // TODO: Handle field type unsigned char *
+        // Handle pointer type unsigned char *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.boneIds = (unsigned char*)(uintptr_t)pointerValue;
+        } else {
+            result.boneIds = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for unsigned char *
-        memset(&result.boneIds, 0, sizeof(result.boneIds));
+        // Set default NULL for pointer type unsigned char *
+        result.boneIds = NULL;
     }
 
     // Get boneWeights
     napi_has_named_property(env, jsObj, "boneWeights", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "boneWeights", &prop);
-        // TODO: Handle field type float *
+        // Handle pointer type float *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.boneWeights = (float*)(uintptr_t)pointerValue;
+        } else {
+            result.boneWeights = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for float *
-        memset(&result.boneWeights, 0, sizeof(result.boneWeights));
+        // Set default NULL for pointer type float *
+        result.boneWeights = NULL;
     }
 
     // Get boneMatrices
     napi_has_named_property(env, jsObj, "boneMatrices", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "boneMatrices", &prop);
-        // TODO: Handle field type Matrix *
+        // Handle pointer type Matrix *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.boneMatrices = (Matrix*)(uintptr_t)pointerValue;
+        } else {
+            result.boneMatrices = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Matrix *
-        memset(&result.boneMatrices, 0, sizeof(result.boneMatrices));
+        // Set default NULL for pointer type Matrix *
+        result.boneMatrices = NULL;
     }
 
     // Get boneCount
@@ -3868,11 +4026,20 @@ Mesh Mesh_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "vboId", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "vboId", &prop);
-        // TODO: Handle field type unsigned int *
+        // Handle pointer type unsigned int *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.vboId = (unsigned int*)(uintptr_t)pointerValue;
+        } else {
+            result.vboId = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for unsigned int *
-        memset(&result.vboId, 0, sizeof(result.vboId));
+        // Set default NULL for pointer type unsigned int *
+        result.vboId = NULL;
     }
 
     return result;
@@ -3892,63 +4059,123 @@ napi_value Mesh_to_js(napi_env env, Mesh data) {
     napi_set_named_property(env, jsObj, "triangleCount", prop);
 
     // Set vertices
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.vertices != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.vertices, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "vertices", prop);
 
     // Set texcoords
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.texcoords != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.texcoords, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "texcoords", prop);
 
     // Set texcoords2
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.texcoords2 != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.texcoords2, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "texcoords2", prop);
 
     // Set normals
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.normals != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.normals, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "normals", prop);
 
     // Set tangents
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.tangents != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.tangents, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "tangents", prop);
 
     // Set colors
-    // TODO: Handle field type unsigned char *
-    napi_get_null(env, &prop);
+    // Handle pointer type unsigned char *
+    if (data.colors != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.colors, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "colors", prop);
 
     // Set indices
-    // TODO: Handle field type unsigned short *
-    napi_get_null(env, &prop);
+    // Handle pointer type unsigned short *
+    if (data.indices != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.indices, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "indices", prop);
 
     // Set animVertices
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.animVertices != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.animVertices, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "animVertices", prop);
 
     // Set animNormals
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.animNormals != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.animNormals, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "animNormals", prop);
 
     // Set boneIds
-    // TODO: Handle field type unsigned char *
-    napi_get_null(env, &prop);
+    // Handle pointer type unsigned char *
+    if (data.boneIds != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.boneIds, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "boneIds", prop);
 
     // Set boneWeights
-    // TODO: Handle field type float *
-    napi_get_null(env, &prop);
+    // Handle pointer type float *
+    if (data.boneWeights != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.boneWeights, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "boneWeights", prop);
 
     // Set boneMatrices
-    // TODO: Handle field type Matrix *
-    napi_get_null(env, &prop);
+    // Handle pointer type Matrix *
+    if (data.boneMatrices != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.boneMatrices, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "boneMatrices", prop);
 
     // Set boneCount
@@ -3960,8 +4187,13 @@ napi_value Mesh_to_js(napi_env env, Mesh data) {
     napi_set_named_property(env, jsObj, "vaoId", prop);
 
     // Set vboId
-    // TODO: Handle field type unsigned int *
-    napi_get_null(env, &prop);
+    // Handle pointer type unsigned int *
+    if (data.vboId != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.vboId, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "vboId", prop);
 
     return jsObj;
@@ -3986,11 +4218,20 @@ Shader Shader_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "locs", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "locs", &prop);
-        // TODO: Handle field type int *
+        // Handle pointer type int *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.locs = (int*)(uintptr_t)pointerValue;
+        } else {
+            result.locs = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for int *
-        memset(&result.locs, 0, sizeof(result.locs));
+        // Set default NULL for pointer type int *
+        result.locs = NULL;
     }
 
     return result;
@@ -4006,8 +4247,13 @@ napi_value Shader_to_js(napi_env env, Shader data) {
     napi_set_named_property(env, jsObj, "id", prop);
 
     // Set locs
-    // TODO: Handle field type int *
-    napi_get_null(env, &prop);
+    // Handle pointer type int *
+    if (data.locs != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.locs, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "locs", prop);
 
     return jsObj;
@@ -4096,11 +4342,20 @@ Material Material_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "maps", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "maps", &prop);
-        // TODO: Handle field type MaterialMap *
+        // Handle pointer type MaterialMap *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.maps = (MaterialMap*)(uintptr_t)pointerValue;
+        } else {
+            result.maps = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for MaterialMap *
-        memset(&result.maps, 0, sizeof(result.maps));
+        // Set default NULL for pointer type MaterialMap *
+        result.maps = NULL;
     }
 
     // Get params
@@ -4127,8 +4382,13 @@ napi_value Material_to_js(napi_env env, Material data) {
     napi_set_named_property(env, jsObj, "shader", prop);
 
     // Set maps
-    // TODO: Handle field type MaterialMap *
-    napi_get_null(env, &prop);
+    // Handle pointer type MaterialMap *
+    if (data.maps != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.maps, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "maps", prop);
 
     // Set params
@@ -4287,33 +4547,60 @@ Model Model_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "meshes", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "meshes", &prop);
-        // TODO: Handle field type Mesh *
+        // Handle pointer type Mesh *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.meshes = (Mesh*)(uintptr_t)pointerValue;
+        } else {
+            result.meshes = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Mesh *
-        memset(&result.meshes, 0, sizeof(result.meshes));
+        // Set default NULL for pointer type Mesh *
+        result.meshes = NULL;
     }
 
     // Get materials
     napi_has_named_property(env, jsObj, "materials", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "materials", &prop);
-        // TODO: Handle field type Material *
+        // Handle pointer type Material *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.materials = (Material*)(uintptr_t)pointerValue;
+        } else {
+            result.materials = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Material *
-        memset(&result.materials, 0, sizeof(result.materials));
+        // Set default NULL for pointer type Material *
+        result.materials = NULL;
     }
 
     // Get meshMaterial
     napi_has_named_property(env, jsObj, "meshMaterial", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "meshMaterial", &prop);
-        // TODO: Handle field type int *
+        // Handle pointer type int *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.meshMaterial = (int*)(uintptr_t)pointerValue;
+        } else {
+            result.meshMaterial = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for int *
-        memset(&result.meshMaterial, 0, sizeof(result.meshMaterial));
+        // Set default NULL for pointer type int *
+        result.meshMaterial = NULL;
     }
 
     // Get boneCount
@@ -4330,22 +4617,40 @@ Model Model_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "bones", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "bones", &prop);
-        // TODO: Handle field type BoneInfo *
+        // Handle pointer type BoneInfo *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.bones = (BoneInfo*)(uintptr_t)pointerValue;
+        } else {
+            result.bones = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for BoneInfo *
-        memset(&result.bones, 0, sizeof(result.bones));
+        // Set default NULL for pointer type BoneInfo *
+        result.bones = NULL;
     }
 
     // Get bindPose
     napi_has_named_property(env, jsObj, "bindPose", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "bindPose", &prop);
-        // TODO: Handle field type Transform *
+        // Handle pointer type Transform *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.bindPose = (Transform*)(uintptr_t)pointerValue;
+        } else {
+            result.bindPose = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Transform *
-        memset(&result.bindPose, 0, sizeof(result.bindPose));
+        // Set default NULL for pointer type Transform *
+        result.bindPose = NULL;
     }
 
     return result;
@@ -4369,18 +4674,33 @@ napi_value Model_to_js(napi_env env, Model data) {
     napi_set_named_property(env, jsObj, "materialCount", prop);
 
     // Set meshes
-    // TODO: Handle field type Mesh *
-    napi_get_null(env, &prop);
+    // Handle pointer type Mesh *
+    if (data.meshes != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.meshes, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "meshes", prop);
 
     // Set materials
-    // TODO: Handle field type Material *
-    napi_get_null(env, &prop);
+    // Handle pointer type Material *
+    if (data.materials != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.materials, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "materials", prop);
 
     // Set meshMaterial
-    // TODO: Handle field type int *
-    napi_get_null(env, &prop);
+    // Handle pointer type int *
+    if (data.meshMaterial != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.meshMaterial, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "meshMaterial", prop);
 
     // Set boneCount
@@ -4388,13 +4708,23 @@ napi_value Model_to_js(napi_env env, Model data) {
     napi_set_named_property(env, jsObj, "boneCount", prop);
 
     // Set bones
-    // TODO: Handle field type BoneInfo *
-    napi_get_null(env, &prop);
+    // Handle pointer type BoneInfo *
+    if (data.bones != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.bones, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "bones", prop);
 
     // Set bindPose
-    // TODO: Handle field type Transform *
-    napi_get_null(env, &prop);
+    // Handle pointer type Transform *
+    if (data.bindPose != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.bindPose, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "bindPose", prop);
 
     return jsObj;
@@ -4429,22 +4759,40 @@ ModelAnimation ModelAnimation_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "bones", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "bones", &prop);
-        // TODO: Handle field type BoneInfo *
+        // Handle pointer type BoneInfo *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.bones = (BoneInfo*)(uintptr_t)pointerValue;
+        } else {
+            result.bones = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for BoneInfo *
-        memset(&result.bones, 0, sizeof(result.bones));
+        // Set default NULL for pointer type BoneInfo *
+        result.bones = NULL;
     }
 
     // Get framePoses
     napi_has_named_property(env, jsObj, "framePoses", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "framePoses", &prop);
-        // TODO: Handle field type Transform **
+        // Handle pointer type Transform **
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.framePoses = (Transform **)(uintptr_t)pointerValue;
+        } else {
+            result.framePoses = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for Transform **
-        memset(&result.framePoses, 0, sizeof(result.framePoses));
+        // Set default NULL for pointer type Transform **
+        result.framePoses = NULL;
     }
 
     // Get name
@@ -4475,13 +4823,23 @@ napi_value ModelAnimation_to_js(napi_env env, ModelAnimation data) {
     napi_set_named_property(env, jsObj, "frameCount", prop);
 
     // Set bones
-    // TODO: Handle field type BoneInfo *
-    napi_get_null(env, &prop);
+    // Handle pointer type BoneInfo *
+    if (data.bones != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.bones, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "bones", prop);
 
     // Set framePoses
-    // TODO: Handle field type Transform **
-    napi_get_null(env, &prop);
+    // Handle pointer type Transform **
+    if (data.framePoses != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.framePoses, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "framePoses", prop);
 
     // Set name
@@ -4709,11 +5067,20 @@ Wave Wave_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "data", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "data", &prop);
-        // TODO: Handle field type void *
+        // Handle pointer type void *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.data = (void*)(uintptr_t)pointerValue;
+        } else {
+            result.data = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for void *
-        memset(&result.data, 0, sizeof(result.data));
+        // Set default NULL for pointer type void *
+        result.data = NULL;
     }
 
     return result;
@@ -4741,8 +5108,13 @@ napi_value Wave_to_js(napi_env env, Wave data) {
     napi_set_named_property(env, jsObj, "channels", prop);
 
     // Set data
-    // TODO: Handle field type void *
-    napi_get_null(env, &prop);
+    // Handle pointer type void *
+    if (data.data != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.data, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "data", prop);
 
     return jsObj;
@@ -4757,22 +5129,40 @@ AudioStream AudioStream_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "buffer", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "buffer", &prop);
-        // TODO: Handle field type rAudioBuffer *
+        // Handle pointer type rAudioBuffer *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.buffer = (rAudioBuffer*)(uintptr_t)pointerValue;
+        } else {
+            result.buffer = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for rAudioBuffer *
-        memset(&result.buffer, 0, sizeof(result.buffer));
+        // Set default NULL for pointer type rAudioBuffer *
+        result.buffer = NULL;
     }
 
     // Get processor
     napi_has_named_property(env, jsObj, "processor", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "processor", &prop);
-        // TODO: Handle field type rAudioProcessor *
+        // Handle pointer type rAudioProcessor *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.processor = (rAudioProcessor*)(uintptr_t)pointerValue;
+        } else {
+            result.processor = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for rAudioProcessor *
-        memset(&result.processor, 0, sizeof(result.processor));
+        // Set default NULL for pointer type rAudioProcessor *
+        result.processor = NULL;
     }
 
     // Get sampleRate
@@ -4814,13 +5204,23 @@ napi_value AudioStream_to_js(napi_env env, AudioStream data) {
     napi_value prop;
 
     // Set buffer
-    // TODO: Handle field type rAudioBuffer *
-    napi_get_null(env, &prop);
+    // Handle pointer type rAudioBuffer *
+    if (data.buffer != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.buffer, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "buffer", prop);
 
     // Set processor
-    // TODO: Handle field type rAudioProcessor *
-    napi_get_null(env, &prop);
+    // Handle pointer type rAudioProcessor *
+    if (data.processor != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.processor, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "processor", prop);
 
     // Set sampleRate
@@ -4933,11 +5333,20 @@ Music Music_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "ctxData", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "ctxData", &prop);
-        // TODO: Handle field type void *
+        // Handle pointer type void *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.ctxData = (void*)(uintptr_t)pointerValue;
+        } else {
+            result.ctxData = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for void *
-        memset(&result.ctxData, 0, sizeof(result.ctxData));
+        // Set default NULL for pointer type void *
+        result.ctxData = NULL;
     }
 
     return result;
@@ -4965,8 +5374,13 @@ napi_value Music_to_js(napi_env env, Music data) {
     napi_set_named_property(env, jsObj, "ctxType", prop);
 
     // Set ctxData
-    // TODO: Handle field type void *
-    napi_get_null(env, &prop);
+    // Handle pointer type void *
+    if (data.ctxData != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.ctxData, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "ctxData", prop);
 
     return jsObj;
@@ -5301,11 +5715,20 @@ FilePathList FilePathList_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "paths", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "paths", &prop);
-        // TODO: Handle field type char **
+        // Handle pointer type char **
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.paths = (char **)(uintptr_t)pointerValue;
+        } else {
+            result.paths = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for char **
-        memset(&result.paths, 0, sizeof(result.paths));
+        // Set default NULL for pointer type char **
+        result.paths = NULL;
     }
 
     return result;
@@ -5325,8 +5748,13 @@ napi_value FilePathList_to_js(napi_env env, FilePathList data) {
     napi_set_named_property(env, jsObj, "count", prop);
 
     // Set paths
-    // TODO: Handle field type char **
-    napi_get_null(env, &prop);
+    // Handle pointer type char **
+    if (data.paths != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.paths, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "paths", prop);
 
     return jsObj;
@@ -5421,11 +5849,20 @@ AutomationEventList AutomationEventList_from_js(napi_env env, napi_value jsObj) 
     napi_has_named_property(env, jsObj, "events", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "events", &prop);
-        // TODO: Handle field type AutomationEvent *
+        // Handle pointer type AutomationEvent *
+        napi_valuetype valueType;
+        napi_typeof(env, prop, &valueType);
+        if (valueType == napi_number) {
+            double pointerValue;
+            napi_get_value_double(env, prop, &pointerValue);
+            result.events = (AutomationEvent*)(uintptr_t)pointerValue;
+        } else {
+            result.events = NULL;
+        }
     } else {
         // Set default value
-        // TODO: Set default for AutomationEvent *
-        memset(&result.events, 0, sizeof(result.events));
+        // Set default NULL for pointer type AutomationEvent *
+        result.events = NULL;
     }
 
     return result;
@@ -5445,8 +5882,13 @@ napi_value AutomationEventList_to_js(napi_env env, AutomationEventList data) {
     napi_set_named_property(env, jsObj, "count", prop);
 
     // Set events
-    // TODO: Handle field type AutomationEvent *
-    napi_get_null(env, &prop);
+    // Handle pointer type AutomationEvent *
+    if (data.events != NULL) {
+        // Store the pointer as a double (JS Number)
+        napi_create_double(env, (double)(uintptr_t)data.events, &prop);
+    } else {
+        napi_get_null(env, &prop);
+    }
     napi_set_named_property(env, jsObj, "events", prop);
 
     return jsObj;
@@ -7362,8 +7804,7 @@ napi_value BindNode_MemRealloc(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void ptr_value = void_from_js(env, args[0]);
-    void * ptr = &ptr_value;
+    void* ptr = void_ptr_from_js(env, args[0]);
 
     unsigned int size;
     napi_get_value_int32(env, args[1], (int32_t*)&size);
@@ -7387,8 +7828,7 @@ napi_value BindNode_MemFree(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void ptr_value = void_from_js(env, args[0]);
-    void * ptr = &ptr_value;
+    void* ptr = void_ptr_from_js(env, args[0]);
 
     MemFree(ptr);
     napi_value jsResult;
@@ -7562,8 +8002,7 @@ napi_value BindNode_SaveFileData(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    void data_value = void_from_js(env, args[1]);
-    void * data = &data_value;
+    void* data = void_ptr_from_js(env, args[1]);
 
     int dataSize;
     napi_get_value_int32(env, args[2], (int32_t*)&dataSize);
@@ -13956,8 +14395,7 @@ napi_value BindNode_GetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void srcPtr_value = void_from_js(env, args[0]);
-    void * srcPtr = &srcPtr_value;
+    void* srcPtr = void_ptr_from_js(env, args[0]);
 
     int format;
     napi_get_value_int32(env, args[1], (int32_t*)&format);
@@ -13978,8 +14416,7 @@ napi_value BindNode_SetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void dstPtr_value = void_from_js(env, args[0]);
-    void * dstPtr = &dstPtr_value;
+    void* dstPtr = void_ptr_from_js(env, args[0]);
 
     Color color = Color_from_js(env, args[1]);
 
