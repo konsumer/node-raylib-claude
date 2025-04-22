@@ -19,6 +19,12 @@ napi_value CreateString(napi_env env, const char* value) {
 }
 
 // Forward declarations for struct conversions
+// Type aliases in raylib - we reuse conversion functions
+// Texture2D = Texture
+// TextureCubemap = Texture
+// Camera = Camera3D
+// RenderTexture2D = RenderTexture
+
 Vector2 Vector2_from_js(napi_env env, napi_value jsObj);
 napi_value Vector2_to_js(napi_env env, Vector2 data);
 Vector3 Vector3_from_js(napi_env env, napi_value jsObj);
@@ -91,12 +97,6 @@ float3 float3_from_js(napi_env env, napi_value jsObj);
 napi_value float3_to_js(napi_env env, float3 data);
 float16 float16_from_js(napi_env env, napi_value jsObj);
 napi_value float16_to_js(napi_env env, float16 data);
-RenderTexture2D RenderTexture2D_from_js(napi_env env, napi_value jsObj);
-napi_value RenderTexture2D_to_js(napi_env env, RenderTexture2D data);
-Texture2D Texture2D_from_js(napi_env env, napi_value jsObj);
-napi_value Texture2D_to_js(napi_env env, Texture2D data);
-Camera Camera_from_js(napi_env env, napi_value jsObj);
-napi_value Camera_to_js(napi_env env, Camera data);
 int int_from_js(napi_env env, napi_value jsObj);
 napi_value int_to_js(napi_env env, int data);
 TraceLogCallback TraceLogCallback_from_js(napi_env env, napi_value jsObj);
@@ -113,8 +113,6 @@ unsigned char unsigned_char_from_js(napi_env env, napi_value jsObj);
 napi_value unsigned_char_to_js(napi_env env, unsigned char data);
 float float_from_js(napi_env env, napi_value jsObj);
 napi_value float_to_js(napi_env env, float data);
-TextureCubemap TextureCubemap_from_js(napi_env env, napi_value jsObj);
-napi_value TextureCubemap_to_js(napi_env env, TextureCubemap data);
 Rectangle * Rectangle___from_js(napi_env env, napi_value jsObj);
 napi_value Rectangle___to_js(napi_env env, Rectangle * data);
 AudioCallback AudioCallback_from_js(napi_env env, napi_value jsObj);
@@ -3359,7 +3357,7 @@ RenderTexture RenderTexture_from_js(napi_env env, napi_value jsObj) {
         result.texture = Texture_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Texture
+        // Default for Texture
         memset(&result.texture, 0, sizeof(result.texture));
     }
 
@@ -3370,7 +3368,7 @@ RenderTexture RenderTexture_from_js(napi_env env, napi_value jsObj) {
         result.depth = Texture_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Texture
+        // Default for Texture
         memset(&result.depth, 0, sizeof(result.depth));
     }
 
@@ -3409,7 +3407,7 @@ NPatchInfo NPatchInfo_from_js(napi_env env, napi_value jsObj) {
         result.source = Rectangle_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Rectangle
+        // Default for Rectangle
         memset(&result.source, 0, sizeof(result.source));
     }
 
@@ -3550,7 +3548,7 @@ GlyphInfo GlyphInfo_from_js(napi_env env, napi_value jsObj) {
         result.image = Image_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Image
+        // Default for Image
         memset(&result.image, 0, sizeof(result.image));
     }
 
@@ -3624,10 +3622,10 @@ Font Font_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "texture", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "texture", &prop);
-        // TODO: Handle field type Texture2D
+        result.texture = Texture_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Texture2D
+        // Default for Texture2D
         memset(&result.texture, 0, sizeof(result.texture));
     }
 
@@ -3692,8 +3690,7 @@ napi_value Font_to_js(napi_env env, Font data) {
     napi_set_named_property(env, jsObj, "glyphPadding", prop);
 
     // Set texture
-    // TODO: Handle field type Texture2D
-    napi_get_null(env, &prop);
+    prop = Texture_to_js(env, data.texture);
     napi_set_named_property(env, jsObj, "texture", prop);
 
     // Set recs
@@ -3731,7 +3728,7 @@ Camera3D Camera3D_from_js(napi_env env, napi_value jsObj) {
         result.position = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.position, 0, sizeof(result.position));
     }
 
@@ -3742,7 +3739,7 @@ Camera3D Camera3D_from_js(napi_env env, napi_value jsObj) {
         result.target = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.target, 0, sizeof(result.target));
     }
 
@@ -3753,7 +3750,7 @@ Camera3D Camera3D_from_js(napi_env env, napi_value jsObj) {
         result.up = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.up, 0, sizeof(result.up));
     }
 
@@ -3822,7 +3819,7 @@ Camera2D Camera2D_from_js(napi_env env, napi_value jsObj) {
         result.offset = Vector2_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector2
+        // Default for Vector2
         memset(&result.offset, 0, sizeof(result.offset));
     }
 
@@ -3833,7 +3830,7 @@ Camera2D Camera2D_from_js(napi_env env, napi_value jsObj) {
         result.target = Vector2_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector2
+        // Default for Vector2
         memset(&result.target, 0, sizeof(result.target));
     }
 
@@ -4419,10 +4416,10 @@ MaterialMap MaterialMap_from_js(napi_env env, napi_value jsObj) {
     napi_has_named_property(env, jsObj, "texture", &has_property);
     if (has_property) {
         napi_get_named_property(env, jsObj, "texture", &prop);
-        // TODO: Handle field type Texture2D
+        result.texture = Texture_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Texture2D
+        // Default for Texture2D
         memset(&result.texture, 0, sizeof(result.texture));
     }
 
@@ -4433,7 +4430,7 @@ MaterialMap MaterialMap_from_js(napi_env env, napi_value jsObj) {
         result.color = Color_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Color
+        // Default for Color
         memset(&result.color, 0, sizeof(result.color));
     }
 
@@ -4458,8 +4455,7 @@ napi_value MaterialMap_to_js(napi_env env, MaterialMap data) {
     napi_value prop;
 
     // Set texture
-    // TODO: Handle field type Texture2D
-    napi_get_null(env, &prop);
+    prop = Texture_to_js(env, data.texture);
     napi_set_named_property(env, jsObj, "texture", prop);
 
     // Set color
@@ -4485,7 +4481,7 @@ Material Material_from_js(napi_env env, napi_value jsObj) {
         result.shader = Shader_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Shader
+        // Default for Shader
         memset(&result.shader, 0, sizeof(result.shader));
     }
 
@@ -4516,7 +4512,7 @@ Material Material_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[4]
     } else {
         // Set default value
-        // TODO: Set default for float[4]
+        // Default for float[4]
         memset(&result.params, 0, sizeof(result.params));
     }
 
@@ -4562,7 +4558,7 @@ Transform Transform_from_js(napi_env env, napi_value jsObj) {
         result.translation = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.translation, 0, sizeof(result.translation));
     }
 
@@ -4573,7 +4569,7 @@ Transform Transform_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type Quaternion
     } else {
         // Set default value
-        // TODO: Set default for Quaternion
+        // Default for Quaternion
         memset(&result.rotation, 0, sizeof(result.rotation));
     }
 
@@ -4584,7 +4580,7 @@ Transform Transform_from_js(napi_env env, napi_value jsObj) {
         result.scale = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.scale, 0, sizeof(result.scale));
     }
 
@@ -4624,7 +4620,7 @@ BoneInfo BoneInfo_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type char[32]
     } else {
         // Set default value
-        // TODO: Set default for char[32]
+        // Default for char[32]
         memset(&result.name, 0, sizeof(result.name));
     }
 
@@ -4670,7 +4666,7 @@ Model Model_from_js(napi_env env, napi_value jsObj) {
         result.transform = Matrix_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Matrix
+        // Default for Matrix
         memset(&result.transform, 0, sizeof(result.transform));
     }
 
@@ -4953,7 +4949,7 @@ ModelAnimation ModelAnimation_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type char[32]
     } else {
         // Set default value
-        // TODO: Set default for char[32]
+        // Default for char[32]
         memset(&result.name, 0, sizeof(result.name));
     }
 
@@ -5013,7 +5009,7 @@ Ray Ray_from_js(napi_env env, napi_value jsObj) {
         result.position = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.position, 0, sizeof(result.position));
     }
 
@@ -5024,7 +5020,7 @@ Ray Ray_from_js(napi_env env, napi_value jsObj) {
         result.direction = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.direction, 0, sizeof(result.direction));
     }
 
@@ -5081,7 +5077,7 @@ RayCollision RayCollision_from_js(napi_env env, napi_value jsObj) {
         result.point = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.point, 0, sizeof(result.point));
     }
 
@@ -5092,7 +5088,7 @@ RayCollision RayCollision_from_js(napi_env env, napi_value jsObj) {
         result.normal = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.normal, 0, sizeof(result.normal));
     }
 
@@ -5135,7 +5131,7 @@ BoundingBox BoundingBox_from_js(napi_env env, napi_value jsObj) {
         result.min = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.min, 0, sizeof(result.min));
     }
 
@@ -5146,7 +5142,7 @@ BoundingBox BoundingBox_from_js(napi_env env, napi_value jsObj) {
         result.max = Vector3_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for Vector3
+        // Default for Vector3
         memset(&result.max, 0, sizeof(result.max));
     }
 
@@ -5401,7 +5397,7 @@ Sound Sound_from_js(napi_env env, napi_value jsObj) {
         result.stream = AudioStream_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for AudioStream
+        // Default for AudioStream
         memset(&result.stream, 0, sizeof(result.stream));
     }
 
@@ -5446,7 +5442,7 @@ Music Music_from_js(napi_env env, napi_value jsObj) {
         result.stream = AudioStream_from_js(env, prop);
     } else {
         // Set default value
-        // TODO: Set default for AudioStream
+        // Default for AudioStream
         memset(&result.stream, 0, sizeof(result.stream));
     }
 
@@ -5629,7 +5625,7 @@ VrDeviceInfo VrDeviceInfo_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[4]
     } else {
         // Set default value
-        // TODO: Set default for float[4]
+        // Default for float[4]
         memset(&result.lensDistortionValues, 0, sizeof(result.lensDistortionValues));
     }
 
@@ -5640,7 +5636,7 @@ VrDeviceInfo VrDeviceInfo_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[4]
     } else {
         // Set default value
-        // TODO: Set default for float[4]
+        // Default for float[4]
         memset(&result.chromaAbCorrection, 0, sizeof(result.chromaAbCorrection));
     }
 
@@ -5705,7 +5701,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type Matrix[2]
     } else {
         // Set default value
-        // TODO: Set default for Matrix[2]
+        // Default for Matrix[2]
         memset(&result.projection, 0, sizeof(result.projection));
     }
 
@@ -5716,7 +5712,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type Matrix[2]
     } else {
         // Set default value
-        // TODO: Set default for Matrix[2]
+        // Default for Matrix[2]
         memset(&result.viewOffset, 0, sizeof(result.viewOffset));
     }
 
@@ -5727,7 +5723,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.leftLensCenter, 0, sizeof(result.leftLensCenter));
     }
 
@@ -5738,7 +5734,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.rightLensCenter, 0, sizeof(result.rightLensCenter));
     }
 
@@ -5749,7 +5745,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.leftScreenCenter, 0, sizeof(result.leftScreenCenter));
     }
 
@@ -5760,7 +5756,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.rightScreenCenter, 0, sizeof(result.rightScreenCenter));
     }
 
@@ -5771,7 +5767,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.scale, 0, sizeof(result.scale));
     }
 
@@ -5782,7 +5778,7 @@ VrStereoConfig VrStereoConfig_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[2]
     } else {
         // Set default value
-        // TODO: Set default for float[2]
+        // Default for float[2]
         memset(&result.scaleIn, 0, sizeof(result.scaleIn));
     }
 
@@ -5943,7 +5939,7 @@ AutomationEvent AutomationEvent_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type int[4]
     } else {
         // Set default value
-        // TODO: Set default for int[4]
+        // Default for int[4]
         memset(&result.params, 0, sizeof(result.params));
     }
 
@@ -6057,7 +6053,7 @@ float3 float3_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[3]
     } else {
         // Set default value
-        // TODO: Set default for float[3]
+        // Default for float[3]
         memset(&result.v, 0, sizeof(result.v));
     }
 
@@ -6089,7 +6085,7 @@ float16 float16_from_js(napi_env env, napi_value jsObj) {
         // TODO: Handle field type float[16]
     } else {
         // Set default value
-        // TODO: Set default for float[16]
+        // Default for float[16]
         memset(&result.v, 0, sizeof(result.v));
     }
 
@@ -6109,49 +6105,40 @@ napi_value float16_to_js(napi_env env, float16 data) {
     return jsObj;
 }
 
-// Stub conversion for undefined struct RenderTexture2D
-RenderTexture2D RenderTexture2D_from_js(napi_env env, napi_value jsObj) {
-    // Warning: No struct definition available for RenderTexture2D
-    RenderTexture2D result;
-    memset(&result, 0, sizeof(result));
-    return result;
-}
-
-napi_value RenderTexture2D_to_js(napi_env env, RenderTexture2D data) {
-    // Warning: No struct definition available for RenderTexture2D
-    napi_value jsObj;
-    napi_create_object(env, &jsObj);
-    return jsObj;
-}
-
-// Stub conversion for undefined struct Texture2D
+// Type alias - Texture2D uses Texture's conversion functions
 Texture2D Texture2D_from_js(napi_env env, napi_value jsObj) {
-    // Warning: No struct definition available for Texture2D
-    Texture2D result;
-    memset(&result, 0, sizeof(result));
-    return result;
+    return Texture_from_js(env, jsObj);
 }
 
 napi_value Texture2D_to_js(napi_env env, Texture2D data) {
-    // Warning: No struct definition available for Texture2D
-    napi_value jsObj;
-    napi_create_object(env, &jsObj);
-    return jsObj;
+    return Texture_to_js(env, data);
 }
 
-// Stub conversion for undefined struct Camera
+// Type alias - TextureCubemap uses Texture's conversion functions
+TextureCubemap TextureCubemap_from_js(napi_env env, napi_value jsObj) {
+    return Texture_from_js(env, jsObj);
+}
+
+napi_value TextureCubemap_to_js(napi_env env, TextureCubemap data) {
+    return Texture_to_js(env, data);
+}
+
+// Type alias - RenderTexture2D uses RenderTexture's conversion functions
+RenderTexture2D RenderTexture2D_from_js(napi_env env, napi_value jsObj) {
+    return RenderTexture_from_js(env, jsObj);
+}
+
+napi_value RenderTexture2D_to_js(napi_env env, RenderTexture2D data) {
+    return RenderTexture_to_js(env, data);
+}
+
+// Type alias - Camera uses Camera3D's conversion functions
 Camera Camera_from_js(napi_env env, napi_value jsObj) {
-    // Warning: No struct definition available for Camera
-    Camera result;
-    memset(&result, 0, sizeof(result));
-    return result;
+    return Camera3D_from_js(env, jsObj);
 }
 
 napi_value Camera_to_js(napi_env env, Camera data) {
-    // Warning: No struct definition available for Camera
-    napi_value jsObj;
-    napi_create_object(env, &jsObj);
-    return jsObj;
+    return Camera3D_to_js(env, data);
 }
 
 // Stub conversion for undefined struct int
@@ -6269,21 +6256,6 @@ float float_from_js(napi_env env, napi_value jsObj) {
 
 napi_value float_to_js(napi_env env, float data) {
     // Warning: No struct definition available for float
-    napi_value jsObj;
-    napi_create_object(env, &jsObj);
-    return jsObj;
-}
-
-// Stub conversion for undefined struct TextureCubemap
-TextureCubemap TextureCubemap_from_js(napi_env env, napi_value jsObj) {
-    // Warning: No struct definition available for TextureCubemap
-    TextureCubemap result;
-    memset(&result, 0, sizeof(result));
-    return result;
-}
-
-napi_value TextureCubemap_to_js(napi_env env, TextureCubemap data) {
-    // Warning: No struct definition available for TextureCubemap
     napi_value jsObj;
     napi_create_object(env, &jsObj);
     return jsObj;
@@ -6750,32 +6722,44 @@ napi_value BindNode_GetWindowHandle(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetScreenWidth(napi_env env, napi_callback_info info) {
     int result = GetScreenWidth();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetScreenHeight(napi_env env, napi_callback_info info) {
     int result = GetScreenHeight();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetRenderWidth(napi_env env, napi_callback_info info) {
     int result = GetRenderWidth();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetRenderHeight(napi_env env, napi_callback_info info) {
     int result = GetRenderHeight();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorCount(napi_env env, napi_callback_info info) {
     int result = GetMonitorCount();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetCurrentMonitor(napi_env env, napi_callback_info info) {
     int result = GetCurrentMonitor();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorPosition(napi_env env, napi_callback_info info) {
@@ -6813,7 +6797,9 @@ napi_value BindNode_GetMonitorWidth(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[0], (int32_t*)&monitor);
 
     int result = GetMonitorWidth(monitor);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorHeight(napi_env env, napi_callback_info info) {
@@ -6832,7 +6818,9 @@ napi_value BindNode_GetMonitorHeight(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[0], (int32_t*)&monitor);
 
     int result = GetMonitorHeight(monitor);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorPhysicalWidth(napi_env env, napi_callback_info info) {
@@ -6851,7 +6839,9 @@ napi_value BindNode_GetMonitorPhysicalWidth(napi_env env, napi_callback_info inf
     napi_get_value_int32(env, args[0], (int32_t*)&monitor);
 
     int result = GetMonitorPhysicalWidth(monitor);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorPhysicalHeight(napi_env env, napi_callback_info info) {
@@ -6870,7 +6860,9 @@ napi_value BindNode_GetMonitorPhysicalHeight(napi_env env, napi_callback_info in
     napi_get_value_int32(env, args[0], (int32_t*)&monitor);
 
     int result = GetMonitorPhysicalHeight(monitor);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMonitorRefreshRate(napi_env env, napi_callback_info info) {
@@ -6889,7 +6881,9 @@ napi_value BindNode_GetMonitorRefreshRate(napi_env env, napi_callback_info info)
     napi_get_value_int32(env, args[0], (int32_t*)&monitor);
 
     int result = GetMonitorRefreshRate(monitor);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetWindowPosition(napi_env env, napi_callback_info info) {
@@ -7123,7 +7117,7 @@ napi_value BindNode_BeginTextureMode(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    RenderTexture2D target = RenderTexture2D_from_js(env, args[0]);
+    RenderTexture2D target = RenderTexture_from_js(env, args[0]);
 
     BeginTextureMode(target);
     napi_value jsResult;
@@ -7392,7 +7386,9 @@ napi_value BindNode_GetShaderLocation(napi_env env, napi_callback_info info) {
 
     int result = GetShaderLocation(shader, uniformName);
     free(uniformName);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetShaderLocationAttrib(napi_env env, napi_callback_info info) {
@@ -7416,7 +7412,9 @@ napi_value BindNode_GetShaderLocationAttrib(napi_env env, napi_callback_info inf
 
     int result = GetShaderLocationAttrib(shader, attribName);
     free(attribName);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SetShaderValue(napi_env env, napi_callback_info info) {
@@ -7522,7 +7520,7 @@ napi_value BindNode_SetShaderValueTexture(napi_env env, napi_callback_info info)
     int locIndex;
     napi_get_value_int32(env, args[1], (int32_t*)&locIndex);
 
-    Texture2D texture = Texture2D_from_js(env, args[2]);
+    Texture2D texture = Texture_from_js(env, args[2]);
 
     SetShaderValueTexture(shader, locIndex, texture);
     napi_value jsResult;
@@ -7564,7 +7562,7 @@ napi_value BindNode_GetScreenToWorldRay(napi_env env, napi_callback_info info) {
 
     Vector2 position = Vector2_from_js(env, args[0]);
 
-    Camera camera = Camera_from_js(env, args[1]);
+    Camera camera = Camera3D_from_js(env, args[1]);
 
     Ray result = GetScreenToWorldRay(position, camera);
     return Ray_to_js(env, result);
@@ -7584,7 +7582,7 @@ napi_value BindNode_GetScreenToWorldRayEx(napi_env env, napi_callback_info info)
 
     Vector2 position = Vector2_from_js(env, args[0]);
 
-    Camera camera = Camera_from_js(env, args[1]);
+    Camera camera = Camera3D_from_js(env, args[1]);
 
     int width;
     napi_get_value_int32(env, args[2], (int32_t*)&width);
@@ -7610,7 +7608,7 @@ napi_value BindNode_GetWorldToScreen(napi_env env, napi_callback_info info) {
 
     Vector3 position = Vector3_from_js(env, args[0]);
 
-    Camera camera = Camera_from_js(env, args[1]);
+    Camera camera = Camera3D_from_js(env, args[1]);
 
     Vector2 result = GetWorldToScreen(position, camera);
     return Vector2_to_js(env, result);
@@ -7630,7 +7628,7 @@ napi_value BindNode_GetWorldToScreenEx(napi_env env, napi_callback_info info) {
 
     Vector3 position = Vector3_from_js(env, args[0]);
 
-    Camera camera = Camera_from_js(env, args[1]);
+    Camera camera = Camera3D_from_js(env, args[1]);
 
     int width;
     napi_get_value_int32(env, args[2], (int32_t*)&width);
@@ -7694,7 +7692,7 @@ napi_value BindNode_GetCameraMatrix(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera = Camera_from_js(env, args[0]);
+    Camera camera = Camera3D_from_js(env, args[0]);
 
     Matrix result = GetCameraMatrix(camera);
     return Matrix_to_js(env, result);
@@ -7741,7 +7739,9 @@ napi_value BindNode_SetTargetFPS(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetFrameTime(napi_env env, napi_callback_info info) {
     float result = GetFrameTime();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetTime(napi_env env, napi_callback_info info) {
@@ -7753,7 +7753,9 @@ napi_value BindNode_GetTime(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetFPS(napi_env env, napi_callback_info info) {
     int result = GetFPS();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SwapScreenBuffer(napi_env env, napi_callback_info info) {
@@ -7831,7 +7833,9 @@ napi_value BindNode_GetRandomValue(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[1], (int32_t*)&max);
 
     int result = GetRandomValue(min, max);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_LoadRandomSequence(napi_env env, napi_callback_info info) {
@@ -7874,8 +7878,8 @@ napi_value BindNode_UnloadRandomSequence(napi_env env, napi_callback_info info) 
         return undefined;
     }
 
-    int sequence_value = int_from_js(env, args[0]);
-    int * sequence = &sequence_value;
+    // Warning: No conversion available for int
+    int * sequence = NULL;
 
     UnloadRandomSequence(sequence);
     napi_value jsResult;
@@ -8034,7 +8038,8 @@ napi_value BindNode_MemRealloc(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void* ptr = void_ptr_from_js(env, args[0]);
+    // Warning: No conversion available for void
+    void * ptr = NULL;
 
     unsigned int size;
     napi_get_value_int32(env, args[1], (int32_t*)&size);
@@ -8058,7 +8063,8 @@ napi_value BindNode_MemFree(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void* ptr = void_ptr_from_js(env, args[0]);
+    // Warning: No conversion available for void
+    void * ptr = NULL;
 
     MemFree(ptr);
     napi_value jsResult;
@@ -8078,7 +8084,9 @@ napi_value BindNode_SetTraceLogCallback(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    TraceLogCallback callback = TraceLogCallback_from_js(env, args[0]);
+    // Warning: No conversion available for TraceLogCallback
+    TraceLogCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetTraceLogCallback(callback);
     napi_value jsResult;
@@ -8098,7 +8106,9 @@ napi_value BindNode_SetLoadFileDataCallback(napi_env env, napi_callback_info inf
         return undefined;
     }
 
-    LoadFileDataCallback callback = LoadFileDataCallback_from_js(env, args[0]);
+    // Warning: No conversion available for LoadFileDataCallback
+    LoadFileDataCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetLoadFileDataCallback(callback);
     napi_value jsResult;
@@ -8118,7 +8128,9 @@ napi_value BindNode_SetSaveFileDataCallback(napi_env env, napi_callback_info inf
         return undefined;
     }
 
-    SaveFileDataCallback callback = SaveFileDataCallback_from_js(env, args[0]);
+    // Warning: No conversion available for SaveFileDataCallback
+    SaveFileDataCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetSaveFileDataCallback(callback);
     napi_value jsResult;
@@ -8138,7 +8150,9 @@ napi_value BindNode_SetLoadFileTextCallback(napi_env env, napi_callback_info inf
         return undefined;
     }
 
-    LoadFileTextCallback callback = LoadFileTextCallback_from_js(env, args[0]);
+    // Warning: No conversion available for LoadFileTextCallback
+    LoadFileTextCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetLoadFileTextCallback(callback);
     napi_value jsResult;
@@ -8158,7 +8172,9 @@ napi_value BindNode_SetSaveFileTextCallback(napi_env env, napi_callback_info inf
         return undefined;
     }
 
-    SaveFileTextCallback callback = SaveFileTextCallback_from_js(env, args[0]);
+    // Warning: No conversion available for SaveFileTextCallback
+    SaveFileTextCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetSaveFileTextCallback(callback);
     napi_value jsResult;
@@ -8183,8 +8199,8 @@ napi_value BindNode_LoadFileData(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    int dataSize_value = int_from_js(env, args[1]);
-    int * dataSize = &dataSize_value;
+    // Warning: No conversion available for int
+    int * dataSize = NULL;
 
     unsigned char * result = LoadFileData(fileName, dataSize);
     free(fileName);
@@ -8206,8 +8222,8 @@ napi_value BindNode_UnloadFileData(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    unsigned char data_value = unsigned_char_from_js(env, args[0]);
-    unsigned char * data = &data_value;
+    // Warning: No conversion available for unsigned char
+    unsigned char * data = NULL;
 
     UnloadFileData(data);
     napi_value jsResult;
@@ -8232,7 +8248,8 @@ napi_value BindNode_SaveFileData(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    void* data = void_ptr_from_js(env, args[1]);
+    // Warning: No conversion available for void
+    void * data = NULL;
 
     int dataSize;
     napi_get_value_int32(env, args[2], (int32_t*)&dataSize);
@@ -8453,7 +8470,9 @@ napi_value BindNode_GetFileLength(napi_env env, napi_callback_info info) {
 
     int result = GetFileLength(fileName);
     free(fileName);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetFileExtension(napi_env env, napi_callback_info info) {
@@ -8637,7 +8656,9 @@ napi_value BindNode_MakeDirectory(napi_env env, napi_callback_info info) {
 
     int result = MakeDirectory(dirPath);
     free(dirPath);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_ChangeDirectory(napi_env env, napi_callback_info info) {
@@ -8859,8 +8880,8 @@ napi_value BindNode_CompressData(napi_env env, napi_callback_info info) {
     int dataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&dataSize);
 
-    int compDataSize_value = int_from_js(env, args[2]);
-    int * compDataSize = &compDataSize_value;
+    // Warning: No conversion available for int
+    int * compDataSize = NULL;
 
     unsigned char * result = CompressData(data, dataSize, compDataSize);
     // TODO: Handle return type unsigned char *
@@ -8887,8 +8908,8 @@ napi_value BindNode_DecompressData(napi_env env, napi_callback_info info) {
     int compDataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&compDataSize);
 
-    int dataSize_value = int_from_js(env, args[2]);
-    int * dataSize = &dataSize_value;
+    // Warning: No conversion available for int
+    int * dataSize = NULL;
 
     unsigned char * result = DecompressData(compData, compDataSize, dataSize);
     // TODO: Handle return type unsigned char *
@@ -8915,8 +8936,8 @@ napi_value BindNode_EncodeDataBase64(napi_env env, napi_callback_info info) {
     int dataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&dataSize);
 
-    int outputSize_value = int_from_js(env, args[2]);
-    int * outputSize = &outputSize_value;
+    // Warning: No conversion available for int
+    int * outputSize = NULL;
 
     char * result = EncodeDataBase64(data, dataSize, outputSize);
     napi_value jsResult;
@@ -8943,8 +8964,8 @@ napi_value BindNode_DecodeDataBase64(napi_env env, napi_callback_info info) {
     // Warning: No conversion available for const unsigned char
     const unsigned char * data = NULL;
 
-    int outputSize_value = int_from_js(env, args[1]);
-    int * outputSize = &outputSize_value;
+    // Warning: No conversion available for int
+    int * outputSize = NULL;
 
     unsigned char * result = DecodeDataBase64(data, outputSize);
     // TODO: Handle return type unsigned char *
@@ -8965,8 +8986,8 @@ napi_value BindNode_ComputeCRC32(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    unsigned char data_value = unsigned_char_from_js(env, args[0]);
-    unsigned char * data = &data_value;
+    // Warning: No conversion available for unsigned char
+    unsigned char * data = NULL;
 
     int dataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&dataSize);
@@ -8989,8 +9010,8 @@ napi_value BindNode_ComputeMD5(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    unsigned char data_value = unsigned_char_from_js(env, args[0]);
-    unsigned char * data = &data_value;
+    // Warning: No conversion available for unsigned char
+    unsigned char * data = NULL;
 
     int dataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&dataSize);
@@ -9014,8 +9035,8 @@ napi_value BindNode_ComputeSHA1(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    unsigned char data_value = unsigned_char_from_js(env, args[0]);
-    unsigned char * data = &data_value;
+    // Warning: No conversion available for unsigned char
+    unsigned char * data = NULL;
 
     int dataSize;
     napi_get_value_int32(env, args[1], (int32_t*)&dataSize);
@@ -9278,12 +9299,16 @@ napi_value BindNode_IsKeyUp(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetKeyPressed(napi_env env, napi_callback_info info) {
     int result = GetKeyPressed();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetCharPressed(napi_env env, napi_callback_info info) {
     int result = GetCharPressed();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SetExitKey(napi_env env, napi_callback_info info) {
@@ -9451,7 +9476,9 @@ napi_value BindNode_IsGamepadButtonUp(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetGamepadButtonPressed(napi_env env, napi_callback_info info) {
     int result = GetGamepadButtonPressed();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGamepadAxisCount(napi_env env, napi_callback_info info) {
@@ -9470,7 +9497,9 @@ napi_value BindNode_GetGamepadAxisCount(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[0], (int32_t*)&gamepad);
 
     int result = GetGamepadAxisCount(gamepad);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGamepadAxisMovement(napi_env env, napi_callback_info info) {
@@ -9492,7 +9521,9 @@ napi_value BindNode_GetGamepadAxisMovement(napi_env env, napi_callback_info info
     napi_get_value_int32(env, args[1], (int32_t*)&axis);
 
     float result = GetGamepadAxisMovement(gamepad, axis);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SetGamepadMappings(napi_env env, napi_callback_info info) {
@@ -9514,7 +9545,9 @@ napi_value BindNode_SetGamepadMappings(napi_env env, napi_callback_info info) {
 
     int result = SetGamepadMappings(mappings);
     free(mappings);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SetGamepadVibration(napi_env env, napi_callback_info info) {
@@ -9636,12 +9669,16 @@ napi_value BindNode_IsMouseButtonUp(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetMouseX(napi_env env, napi_callback_info info) {
     int result = GetMouseX();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMouseY(napi_env env, napi_callback_info info) {
     int result = GetMouseY();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMousePosition(napi_env env, napi_callback_info info) {
@@ -9730,7 +9767,9 @@ napi_value BindNode_SetMouseScale(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetMouseWheelMove(napi_env env, napi_callback_info info) {
     float result = GetMouseWheelMove();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMouseWheelMoveV(napi_env env, napi_callback_info info) {
@@ -9761,12 +9800,16 @@ napi_value BindNode_SetMouseCursor(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetTouchX(napi_env env, napi_callback_info info) {
     int result = GetTouchX();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetTouchY(napi_env env, napi_callback_info info) {
     int result = GetTouchY();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetTouchPosition(napi_env env, napi_callback_info info) {
@@ -9804,12 +9847,16 @@ napi_value BindNode_GetTouchPointId(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[0], (int32_t*)&index);
 
     int result = GetTouchPointId(index);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetTouchPointCount(napi_env env, napi_callback_info info) {
     int result = GetTouchPointCount();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_SetGesturesEnabled(napi_env env, napi_callback_info info) {
@@ -9856,12 +9903,16 @@ napi_value BindNode_IsGestureDetected(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetGestureDetected(napi_env env, napi_callback_info info) {
     int result = GetGestureDetected();
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGestureHoldDuration(napi_env env, napi_callback_info info) {
     float result = GetGestureHoldDuration();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGestureDragVector(napi_env env, napi_callback_info info) {
@@ -9871,7 +9922,9 @@ napi_value BindNode_GetGestureDragVector(napi_env env, napi_callback_info info) 
 
 napi_value BindNode_GetGestureDragAngle(napi_env env, napi_callback_info info) {
     float result = GetGestureDragAngle();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGesturePinchVector(napi_env env, napi_callback_info info) {
@@ -9881,7 +9934,9 @@ napi_value BindNode_GetGesturePinchVector(napi_env env, napi_callback_info info)
 
 napi_value BindNode_GetGesturePinchAngle(napi_env env, napi_callback_info info) {
     float result = GetGesturePinchAngle();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_UpdateCamera(napi_env env, napi_callback_info info) {
@@ -9896,7 +9951,7 @@ napi_value BindNode_UpdateCamera(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera_value = Camera_from_js(env, args[0]);
+    Camera camera_value = Camera3D_from_js(env, args[0]);
     Camera * camera = &camera_value;
 
     int mode;
@@ -9920,7 +9975,7 @@ napi_value BindNode_UpdateCameraPro(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera_value = Camera_from_js(env, args[0]);
+    Camera camera_value = Camera3D_from_js(env, args[0]);
     Camera * camera = &camera_value;
 
     Vector3 movement = Vector3_from_js(env, args[1]);
@@ -9949,7 +10004,7 @@ napi_value BindNode_SetShapesTexture(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Rectangle source = Rectangle_from_js(env, args[1]);
 
@@ -9961,7 +10016,7 @@ napi_value BindNode_SetShapesTexture(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetShapesTexture(napi_env env, napi_callback_info info) {
     Texture2D result = GetShapesTexture();
-    return Texture2D_to_js(env, result);
+    return Texture_to_js(env, result);
 }
 
 napi_value BindNode_GetShapesTextureRectangle(napi_env env, napi_callback_info info) {
@@ -11874,8 +11929,8 @@ napi_value BindNode_LoadImageAnim(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    int frames_value = int_from_js(env, args[1]);
-    int * frames = &frames_value;
+    // Warning: No conversion available for int
+    int * frames = NULL;
 
     Image result = LoadImageAnim(fileName, frames);
     free(fileName);
@@ -11905,8 +11960,8 @@ napi_value BindNode_LoadImageAnimFromMemory(napi_env env, napi_callback_info inf
     int dataSize;
     napi_get_value_int32(env, args[2], (int32_t*)&dataSize);
 
-    int frames_value = int_from_js(env, args[3]);
-    int * frames = &frames_value;
+    // Warning: No conversion available for int
+    int * frames = NULL;
 
     Image result = LoadImageAnimFromMemory(fileType, fileData, dataSize, frames);
     free(fileType);
@@ -11953,7 +12008,7 @@ napi_value BindNode_LoadImageFromTexture(napi_env env, napi_callback_info info) 
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Image result = LoadImageFromTexture(texture);
     return Image_to_js(env, result);
@@ -12049,8 +12104,8 @@ napi_value BindNode_ExportImageToMemory(napi_env env, napi_callback_info info) {
     char* fileType = (char*)malloc(fileType_len + 1);
     napi_get_value_string_utf8(env, args[1], fileType, fileType_len + 1, &fileType_len);
 
-    int fileSize_value = int_from_js(env, args[2]);
-    int * fileSize = &fileSize_value;
+    // Warning: No conversion available for int
+    int * fileSize = NULL;
 
     unsigned char * result = ExportImageToMemory(image, fileType, fileSize);
     free(fileType);
@@ -13107,8 +13162,8 @@ napi_value BindNode_LoadImagePalette(napi_env env, napi_callback_info info) {
     int maxPaletteSize;
     napi_get_value_int32(env, args[1], (int32_t*)&maxPaletteSize);
 
-    int colorCount_value = int_from_js(env, args[2]);
-    int * colorCount = &colorCount_value;
+    // Warning: No conversion available for int
+    int * colorCount = NULL;
 
     Color * result = LoadImagePalette(image, maxPaletteSize, colorCount);
     // TODO: Handle return type Color *
@@ -13885,7 +13940,7 @@ napi_value BindNode_LoadTexture(napi_env env, napi_callback_info info) {
 
     Texture2D result = LoadTexture(fileName);
     free(fileName);
-    return Texture2D_to_js(env, result);
+    return Texture_to_js(env, result);
 }
 
 napi_value BindNode_LoadTextureFromImage(napi_env env, napi_callback_info info) {
@@ -13903,7 +13958,7 @@ napi_value BindNode_LoadTextureFromImage(napi_env env, napi_callback_info info) 
     Image image = Image_from_js(env, args[0]);
 
     Texture2D result = LoadTextureFromImage(image);
-    return Texture2D_to_js(env, result);
+    return Texture_to_js(env, result);
 }
 
 napi_value BindNode_LoadTextureCubemap(napi_env env, napi_callback_info info) {
@@ -13924,7 +13979,7 @@ napi_value BindNode_LoadTextureCubemap(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[1], (int32_t*)&layout);
 
     TextureCubemap result = LoadTextureCubemap(image, layout);
-    return TextureCubemap_to_js(env, result);
+    return Texture_to_js(env, result);
 }
 
 napi_value BindNode_LoadRenderTexture(napi_env env, napi_callback_info info) {
@@ -13946,7 +14001,7 @@ napi_value BindNode_LoadRenderTexture(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[1], (int32_t*)&height);
 
     RenderTexture2D result = LoadRenderTexture(width, height);
-    return RenderTexture2D_to_js(env, result);
+    return RenderTexture_to_js(env, result);
 }
 
 napi_value BindNode_IsTextureValid(napi_env env, napi_callback_info info) {
@@ -13961,7 +14016,7 @@ napi_value BindNode_IsTextureValid(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     bool result = IsTextureValid(texture);
     napi_value jsResult;
@@ -13981,7 +14036,7 @@ napi_value BindNode_UnloadTexture(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     UnloadTexture(texture);
     napi_value jsResult;
@@ -14001,7 +14056,7 @@ napi_value BindNode_IsRenderTextureValid(napi_env env, napi_callback_info info) 
         return undefined;
     }
 
-    RenderTexture2D target = RenderTexture2D_from_js(env, args[0]);
+    RenderTexture2D target = RenderTexture_from_js(env, args[0]);
 
     bool result = IsRenderTextureValid(target);
     napi_value jsResult;
@@ -14021,7 +14076,7 @@ napi_value BindNode_UnloadRenderTexture(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    RenderTexture2D target = RenderTexture2D_from_js(env, args[0]);
+    RenderTexture2D target = RenderTexture_from_js(env, args[0]);
 
     UnloadRenderTexture(target);
     napi_value jsResult;
@@ -14041,7 +14096,7 @@ napi_value BindNode_UpdateTexture(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     // Warning: No conversion available for const void
     const void * pixels = NULL;
@@ -14064,7 +14119,7 @@ napi_value BindNode_UpdateTextureRec(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Rectangle rec = Rectangle_from_js(env, args[1]);
 
@@ -14089,7 +14144,7 @@ napi_value BindNode_GenTextureMipmaps(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture_value = Texture2D_from_js(env, args[0]);
+    Texture2D texture_value = Texture_from_js(env, args[0]);
     Texture2D * texture = &texture_value;
 
     GenTextureMipmaps(texture);
@@ -14110,7 +14165,7 @@ napi_value BindNode_SetTextureFilter(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     int filter;
     napi_get_value_int32(env, args[1], (int32_t*)&filter);
@@ -14133,7 +14188,7 @@ napi_value BindNode_SetTextureWrap(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     int wrap;
     napi_get_value_int32(env, args[1], (int32_t*)&wrap);
@@ -14156,7 +14211,7 @@ napi_value BindNode_DrawTexture(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     int posX;
     napi_get_value_int32(env, args[1], (int32_t*)&posX);
@@ -14184,7 +14239,7 @@ napi_value BindNode_DrawTextureV(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Vector2 position = Vector2_from_js(env, args[1]);
 
@@ -14208,7 +14263,7 @@ napi_value BindNode_DrawTextureEx(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Vector2 position = Vector2_from_js(env, args[1]);
 
@@ -14240,7 +14295,7 @@ napi_value BindNode_DrawTextureRec(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Rectangle source = Rectangle_from_js(env, args[1]);
 
@@ -14266,7 +14321,7 @@ napi_value BindNode_DrawTexturePro(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     Rectangle source = Rectangle_from_js(env, args[1]);
 
@@ -14298,7 +14353,7 @@ napi_value BindNode_DrawTextureNPatch(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Texture2D texture = Texture2D_from_js(env, args[0]);
+    Texture2D texture = Texture_from_js(env, args[0]);
 
     NPatchInfo nPatchInfo = NPatchInfo_from_js(env, args[1]);
 
@@ -14377,7 +14432,9 @@ napi_value BindNode_ColorToInt(napi_env env, napi_callback_info info) {
     Color color = Color_from_js(env, args[0]);
 
     int result = ColorToInt(color);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_ColorNormalize(napi_env env, napi_callback_info info) {
@@ -14625,7 +14682,8 @@ napi_value BindNode_GetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void* srcPtr = void_ptr_from_js(env, args[0]);
+    // Warning: No conversion available for void
+    void * srcPtr = NULL;
 
     int format;
     napi_get_value_int32(env, args[1], (int32_t*)&format);
@@ -14646,7 +14704,8 @@ napi_value BindNode_SetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void* dstPtr = void_ptr_from_js(env, args[0]);
+    // Warning: No conversion available for void
+    void * dstPtr = NULL;
 
     Color color = Color_from_js(env, args[1]);
 
@@ -14681,7 +14740,9 @@ napi_value BindNode_GetPixelDataSize(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[2], (int32_t*)&format);
 
     int result = GetPixelDataSize(width, height, format);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetFontDefault(napi_env env, napi_callback_info info) {
@@ -14731,8 +14792,8 @@ napi_value BindNode_LoadFontEx(napi_env env, napi_callback_info info) {
     int fontSize;
     napi_get_value_int32(env, args[1], (int32_t*)&fontSize);
 
-    int codepoints_value = int_from_js(env, args[2]);
-    int * codepoints = &codepoints_value;
+    // Warning: No conversion available for int
+    int * codepoints = NULL;
 
     int codepointCount;
     napi_get_value_int32(env, args[3], (int32_t*)&codepointCount);
@@ -14791,8 +14852,8 @@ napi_value BindNode_LoadFontFromMemory(napi_env env, napi_callback_info info) {
     int fontSize;
     napi_get_value_int32(env, args[3], (int32_t*)&fontSize);
 
-    int codepoints_value = int_from_js(env, args[4]);
-    int * codepoints = &codepoints_value;
+    // Warning: No conversion available for int
+    int * codepoints = NULL;
 
     int codepointCount;
     napi_get_value_int32(env, args[5], (int32_t*)&codepointCount);
@@ -14843,8 +14904,8 @@ napi_value BindNode_LoadFontData(napi_env env, napi_callback_info info) {
     int fontSize;
     napi_get_value_int32(env, args[2], (int32_t*)&fontSize);
 
-    int codepoints_value = int_from_js(env, args[3]);
-    int * codepoints = &codepoints_value;
+    // Warning: No conversion available for int
+    int * codepoints = NULL;
 
     int codepointCount;
     napi_get_value_int32(env, args[4], (int32_t*)&codepointCount);
@@ -14874,8 +14935,8 @@ napi_value BindNode_GenImageFontAtlas(napi_env env, napi_callback_info info) {
     // Warning: No conversion available for const GlyphInfo
     const GlyphInfo * glyphs = NULL;
 
-    Rectangle * glyphRecs_value = Rectangle___from_js(env, args[1]);
-    Rectangle ** glyphRecs = &glyphRecs_value;
+    // Warning: No conversion available for Rectangle *
+    Rectangle ** glyphRecs = NULL;
 
     int glyphCount;
     napi_get_value_int32(env, args[2], (int32_t*)&glyphCount);
@@ -15216,7 +15277,9 @@ napi_value BindNode_MeasureText(napi_env env, napi_callback_info info) {
 
     int result = MeasureText(text, fontSize);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_MeasureTextEx(napi_env env, napi_callback_info info) {
@@ -15269,7 +15332,9 @@ napi_value BindNode_GetGlyphIndex(napi_env env, napi_callback_info info) {
     napi_get_value_int32(env, args[1], (int32_t*)&codepoint);
 
     int result = GetGlyphIndex(font, codepoint);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetGlyphInfo(napi_env env, napi_callback_info info) {
@@ -15383,8 +15448,8 @@ napi_value BindNode_LoadCodepoints(napi_env env, napi_callback_info info) {
     char* text = (char*)malloc(text_len + 1);
     napi_get_value_string_utf8(env, args[0], text, text_len + 1, &text_len);
 
-    int count_value = int_from_js(env, args[1]);
-    int * count = &count_value;
+    // Warning: No conversion available for int
+    int * count = NULL;
 
     int * result = LoadCodepoints(text, count);
     free(text);
@@ -15406,8 +15471,8 @@ napi_value BindNode_UnloadCodepoints(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    int codepoints_value = int_from_js(env, args[0]);
-    int * codepoints = &codepoints_value;
+    // Warning: No conversion available for int
+    int * codepoints = NULL;
 
     UnloadCodepoints(codepoints);
     napi_value jsResult;
@@ -15434,7 +15499,9 @@ napi_value BindNode_GetCodepointCount(napi_env env, napi_callback_info info) {
 
     int result = GetCodepointCount(text);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetCodepoint(napi_env env, napi_callback_info info) {
@@ -15454,12 +15521,14 @@ napi_value BindNode_GetCodepoint(napi_env env, napi_callback_info info) {
     char* text = (char*)malloc(text_len + 1);
     napi_get_value_string_utf8(env, args[0], text, text_len + 1, &text_len);
 
-    int codepointSize_value = int_from_js(env, args[1]);
-    int * codepointSize = &codepointSize_value;
+    // Warning: No conversion available for int
+    int * codepointSize = NULL;
 
     int result = GetCodepoint(text, codepointSize);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetCodepointNext(napi_env env, napi_callback_info info) {
@@ -15479,12 +15548,14 @@ napi_value BindNode_GetCodepointNext(napi_env env, napi_callback_info info) {
     char* text = (char*)malloc(text_len + 1);
     napi_get_value_string_utf8(env, args[0], text, text_len + 1, &text_len);
 
-    int codepointSize_value = int_from_js(env, args[1]);
-    int * codepointSize = &codepointSize_value;
+    // Warning: No conversion available for int
+    int * codepointSize = NULL;
 
     int result = GetCodepointNext(text, codepointSize);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetCodepointPrevious(napi_env env, napi_callback_info info) {
@@ -15504,12 +15575,14 @@ napi_value BindNode_GetCodepointPrevious(napi_env env, napi_callback_info info) 
     char* text = (char*)malloc(text_len + 1);
     napi_get_value_string_utf8(env, args[0], text, text_len + 1, &text_len);
 
-    int codepointSize_value = int_from_js(env, args[1]);
-    int * codepointSize = &codepointSize_value;
+    // Warning: No conversion available for int
+    int * codepointSize = NULL;
 
     int result = GetCodepointPrevious(text, codepointSize);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_CodepointToUTF8(napi_env env, napi_callback_info info) {
@@ -15527,8 +15600,8 @@ napi_value BindNode_CodepointToUTF8(napi_env env, napi_callback_info info) {
     int codepoint;
     napi_get_value_int32(env, args[0], (int32_t*)&codepoint);
 
-    int utf8Size_value = int_from_js(env, args[1]);
-    int * utf8Size = &utf8Size_value;
+    // Warning: No conversion available for int
+    int * utf8Size = NULL;
 
     const char * result = CodepointToUTF8(codepoint, utf8Size);
     napi_value jsResult;
@@ -15565,7 +15638,9 @@ napi_value BindNode_TextCopy(napi_env env, napi_callback_info info) {
     int result = TextCopy(dst, src);
     free(dst);
     free(src);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_TextIsEqual(napi_env env, napi_callback_info info) {
@@ -15815,8 +15890,8 @@ napi_value BindNode_TextSplit(napi_env env, napi_callback_info info) {
     char delimiter;
     napi_get_value_int32(env, args[1], (int32_t*)&delimiter);
 
-    int count_value = int_from_js(env, args[2]);
-    int * count = &count_value;
+    // Warning: No conversion available for int
+    int * count = NULL;
 
     const char ** result = TextSplit(text, delimiter, count);
     free(text);
@@ -15848,8 +15923,8 @@ napi_value BindNode_TextAppend(napi_env env, napi_callback_info info) {
     char* append = (char*)malloc(append_len + 1);
     napi_get_value_string_utf8(env, args[1], append, append_len + 1, &append_len);
 
-    int position_value = int_from_js(env, args[2]);
-    int * position = &position_value;
+    // Warning: No conversion available for int
+    int * position = NULL;
 
     TextAppend(text, append, position);
     free(text);
@@ -15884,7 +15959,9 @@ napi_value BindNode_TextFindIndex(napi_env env, napi_callback_info info) {
     int result = TextFindIndex(text, find);
     free(text);
     free(find);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_TextToUpper(napi_env env, napi_callback_info info) {
@@ -16046,7 +16123,9 @@ napi_value BindNode_TextToInteger(napi_env env, napi_callback_info info) {
 
     int result = TextToInteger(text);
     free(text);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_TextToFloat(napi_env env, napi_callback_info info) {
@@ -16068,7 +16147,9 @@ napi_value BindNode_TextToFloat(napi_env env, napi_callback_info info) {
 
     float result = TextToFloat(text);
     free(text);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_DrawLine3D(napi_env env, napi_callback_info info) {
@@ -17002,9 +17083,9 @@ napi_value BindNode_DrawBillboard(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera = Camera_from_js(env, args[0]);
+    Camera camera = Camera3D_from_js(env, args[0]);
 
-    Texture2D texture = Texture2D_from_js(env, args[1]);
+    Texture2D texture = Texture_from_js(env, args[1]);
 
     Vector3 position = Vector3_from_js(env, args[2]);
 
@@ -17032,9 +17113,9 @@ napi_value BindNode_DrawBillboardRec(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera = Camera_from_js(env, args[0]);
+    Camera camera = Camera3D_from_js(env, args[0]);
 
-    Texture2D texture = Texture2D_from_js(env, args[1]);
+    Texture2D texture = Texture_from_js(env, args[1]);
 
     Rectangle source = Rectangle_from_js(env, args[2]);
 
@@ -17062,9 +17143,9 @@ napi_value BindNode_DrawBillboardPro(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Camera camera = Camera_from_js(env, args[0]);
+    Camera camera = Camera3D_from_js(env, args[0]);
 
-    Texture2D texture = Texture2D_from_js(env, args[1]);
+    Texture2D texture = Texture_from_js(env, args[1]);
 
     Rectangle source = Rectangle_from_js(env, args[2]);
 
@@ -17611,8 +17692,8 @@ napi_value BindNode_LoadMaterials(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    int materialCount_value = int_from_js(env, args[1]);
-    int * materialCount = &materialCount_value;
+    // Warning: No conversion available for int
+    int * materialCount = NULL;
 
     Material * result = LoadMaterials(fileName, materialCount);
     free(fileName);
@@ -17685,7 +17766,7 @@ napi_value BindNode_SetMaterialTexture(napi_env env, napi_callback_info info) {
     int mapType;
     napi_get_value_int32(env, args[1], (int32_t*)&mapType);
 
-    Texture2D texture = Texture2D_from_js(env, args[2]);
+    Texture2D texture = Texture_from_js(env, args[2]);
 
     SetMaterialTexture(material, mapType, texture);
     napi_value jsResult;
@@ -17737,8 +17818,8 @@ napi_value BindNode_LoadModelAnimations(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    int animCount_value = int_from_js(env, args[1]);
-    int * animCount = &animCount_value;
+    // Warning: No conversion available for int
+    int * animCount = NULL;
 
     ModelAnimation * result = LoadModelAnimations(fileName, animCount);
     free(fileName);
@@ -18103,7 +18184,9 @@ napi_value BindNode_SetMasterVolume(napi_env env, napi_callback_info info) {
 
 napi_value BindNode_GetMasterVolume(napi_env env, napi_callback_info info) {
     float result = GetMasterVolume();
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_LoadWave(napi_env env, napi_callback_info info) {
@@ -18672,8 +18755,8 @@ napi_value BindNode_UnloadWaveSamples(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    float samples_value = float_from_js(env, args[0]);
-    float * samples = &samples_value;
+    // Warning: No conversion available for float
+    float * samples = NULL;
 
     UnloadWaveSamples(samples);
     napi_value jsResult;
@@ -19002,7 +19085,9 @@ napi_value BindNode_GetMusicTimeLength(napi_env env, napi_callback_info info) {
     Music music = Music_from_js(env, args[0]);
 
     float result = GetMusicTimeLength(music);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_GetMusicTimePlayed(napi_env env, napi_callback_info info) {
@@ -19020,7 +19105,9 @@ napi_value BindNode_GetMusicTimePlayed(napi_env env, napi_callback_info info) {
     Music music = Music_from_js(env, args[0]);
 
     float result = GetMusicTimePlayed(music);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_LoadAudioStream(napi_env env, napi_callback_info info) {
@@ -19341,7 +19428,9 @@ napi_value BindNode_SetAudioStreamCallback(napi_env env, napi_callback_info info
 
     AudioStream stream = AudioStream_from_js(env, args[0]);
 
-    AudioCallback callback = AudioCallback_from_js(env, args[1]);
+    // Warning: No conversion available for AudioCallback
+    AudioCallback callback;
+    memset(&callback, 0, sizeof(callback));
 
     SetAudioStreamCallback(stream, callback);
     napi_value jsResult;
@@ -19363,7 +19452,9 @@ napi_value BindNode_AttachAudioStreamProcessor(napi_env env, napi_callback_info 
 
     AudioStream stream = AudioStream_from_js(env, args[0]);
 
-    AudioCallback processor = AudioCallback_from_js(env, args[1]);
+    // Warning: No conversion available for AudioCallback
+    AudioCallback processor;
+    memset(&processor, 0, sizeof(processor));
 
     AttachAudioStreamProcessor(stream, processor);
     napi_value jsResult;
@@ -19385,7 +19476,9 @@ napi_value BindNode_DetachAudioStreamProcessor(napi_env env, napi_callback_info 
 
     AudioStream stream = AudioStream_from_js(env, args[0]);
 
-    AudioCallback processor = AudioCallback_from_js(env, args[1]);
+    // Warning: No conversion available for AudioCallback
+    AudioCallback processor;
+    memset(&processor, 0, sizeof(processor));
 
     DetachAudioStreamProcessor(stream, processor);
     napi_value jsResult;
@@ -19405,7 +19498,9 @@ napi_value BindNode_AttachAudioMixedProcessor(napi_env env, napi_callback_info i
         return undefined;
     }
 
-    AudioCallback processor = AudioCallback_from_js(env, args[0]);
+    // Warning: No conversion available for AudioCallback
+    AudioCallback processor;
+    memset(&processor, 0, sizeof(processor));
 
     AttachAudioMixedProcessor(processor);
     napi_value jsResult;
@@ -19425,7 +19520,9 @@ napi_value BindNode_DetachAudioMixedProcessor(napi_env env, napi_callback_info i
         return undefined;
     }
 
-    AudioCallback processor = AudioCallback_from_js(env, args[0]);
+    // Warning: No conversion available for AudioCallback
+    AudioCallback processor;
+    memset(&processor, 0, sizeof(processor));
 
     DetachAudioMixedProcessor(processor);
     napi_value jsResult;
@@ -19458,7 +19555,9 @@ napi_value BindNode_Clamp(napi_env env, napi_callback_info info) {
     float max = (float)temp_max;
 
     float result = Clamp(value, min, max);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Lerp(napi_env env, napi_callback_info info) {
@@ -19486,7 +19585,9 @@ napi_value BindNode_Lerp(napi_env env, napi_callback_info info) {
     float amount = (float)temp_amount;
 
     float result = Lerp(start, end, amount);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Normalize(napi_env env, napi_callback_info info) {
@@ -19514,7 +19615,9 @@ napi_value BindNode_Normalize(napi_env env, napi_callback_info info) {
     float end = (float)temp_end;
 
     float result = Normalize(value, start, end);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Remap(napi_env env, napi_callback_info info) {
@@ -19550,7 +19653,9 @@ napi_value BindNode_Remap(napi_env env, napi_callback_info info) {
     float outputEnd = (float)temp_outputEnd;
 
     float result = Remap(value, inputStart, inputEnd, outputStart, outputEnd);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Wrap(napi_env env, napi_callback_info info) {
@@ -19578,7 +19683,9 @@ napi_value BindNode_Wrap(napi_env env, napi_callback_info info) {
     float max = (float)temp_max;
 
     float result = Wrap(value, min, max);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_FloatEquals(napi_env env, napi_callback_info info) {
@@ -19602,7 +19709,9 @@ napi_value BindNode_FloatEquals(napi_env env, napi_callback_info info) {
     float y = (float)temp_y;
 
     int result = FloatEquals(x, y);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2Zero(napi_env env, napi_callback_info info) {
@@ -19714,7 +19823,9 @@ napi_value BindNode_Vector2Length(napi_env env, napi_callback_info info) {
     Vector2 v = Vector2_from_js(env, args[0]);
 
     float result = Vector2Length(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2LengthSqr(napi_env env, napi_callback_info info) {
@@ -19732,7 +19843,9 @@ napi_value BindNode_Vector2LengthSqr(napi_env env, napi_callback_info info) {
     Vector2 v = Vector2_from_js(env, args[0]);
 
     float result = Vector2LengthSqr(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2DotProduct(napi_env env, napi_callback_info info) {
@@ -19752,7 +19865,9 @@ napi_value BindNode_Vector2DotProduct(napi_env env, napi_callback_info info) {
     Vector2 v2 = Vector2_from_js(env, args[1]);
 
     float result = Vector2DotProduct(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2Distance(napi_env env, napi_callback_info info) {
@@ -19772,7 +19887,9 @@ napi_value BindNode_Vector2Distance(napi_env env, napi_callback_info info) {
     Vector2 v2 = Vector2_from_js(env, args[1]);
 
     float result = Vector2Distance(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2DistanceSqr(napi_env env, napi_callback_info info) {
@@ -19792,7 +19909,9 @@ napi_value BindNode_Vector2DistanceSqr(napi_env env, napi_callback_info info) {
     Vector2 v2 = Vector2_from_js(env, args[1]);
 
     float result = Vector2DistanceSqr(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2Angle(napi_env env, napi_callback_info info) {
@@ -19812,7 +19931,9 @@ napi_value BindNode_Vector2Angle(napi_env env, napi_callback_info info) {
     Vector2 v2 = Vector2_from_js(env, args[1]);
 
     float result = Vector2Angle(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2LineAngle(napi_env env, napi_callback_info info) {
@@ -19832,7 +19953,9 @@ napi_value BindNode_Vector2LineAngle(napi_env env, napi_callback_info info) {
     Vector2 end = Vector2_from_js(env, args[1]);
 
     float result = Vector2LineAngle(start, end);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2Scale(napi_env env, napi_callback_info info) {
@@ -20166,7 +20289,9 @@ napi_value BindNode_Vector2Equals(napi_env env, napi_callback_info info) {
     Vector2 q = Vector2_from_js(env, args[1]);
 
     int result = Vector2Equals(p, q);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector2Refract(napi_env env, napi_callback_info info) {
@@ -20384,7 +20509,9 @@ napi_value BindNode_Vector3Length(napi_env env, napi_callback_info info) {
     memset(&v, 0, sizeof(v));
 
     float result = Vector3Length(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3LengthSqr(napi_env env, napi_callback_info info) {
@@ -20404,7 +20531,9 @@ napi_value BindNode_Vector3LengthSqr(napi_env env, napi_callback_info info) {
     memset(&v, 0, sizeof(v));
 
     float result = Vector3LengthSqr(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3DotProduct(napi_env env, napi_callback_info info) {
@@ -20424,7 +20553,9 @@ napi_value BindNode_Vector3DotProduct(napi_env env, napi_callback_info info) {
     Vector3 v2 = Vector3_from_js(env, args[1]);
 
     float result = Vector3DotProduct(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3Distance(napi_env env, napi_callback_info info) {
@@ -20444,7 +20575,9 @@ napi_value BindNode_Vector3Distance(napi_env env, napi_callback_info info) {
     Vector3 v2 = Vector3_from_js(env, args[1]);
 
     float result = Vector3Distance(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3DistanceSqr(napi_env env, napi_callback_info info) {
@@ -20464,7 +20597,9 @@ napi_value BindNode_Vector3DistanceSqr(napi_env env, napi_callback_info info) {
     Vector3 v2 = Vector3_from_js(env, args[1]);
 
     float result = Vector3DistanceSqr(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3Angle(napi_env env, napi_callback_info info) {
@@ -20484,7 +20619,9 @@ napi_value BindNode_Vector3Angle(napi_env env, napi_callback_info info) {
     Vector3 v2 = Vector3_from_js(env, args[1]);
 
     float result = Vector3Angle(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3Negate(napi_env env, napi_callback_info info) {
@@ -20641,7 +20778,9 @@ napi_value BindNode_Vector3RotateByQuaternion(napi_env env, napi_callback_info i
 
     Vector3 v = Vector3_from_js(env, args[0]);
 
-    Quaternion q = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Vector3 result = Vector3RotateByQuaternion(v, q);
     return Vector3_to_js(env, result);
@@ -20954,7 +21093,9 @@ napi_value BindNode_Vector3Equals(napi_env env, napi_callback_info info) {
     Vector3 q = Vector3_from_js(env, args[1]);
 
     int result = Vector3Equals(p, q);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector3Refract(napi_env env, napi_callback_info info) {
@@ -21090,7 +21231,9 @@ napi_value BindNode_Vector4Length(napi_env env, napi_callback_info info) {
     Vector4 v = Vector4_from_js(env, args[0]);
 
     float result = Vector4Length(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector4LengthSqr(napi_env env, napi_callback_info info) {
@@ -21108,7 +21251,9 @@ napi_value BindNode_Vector4LengthSqr(napi_env env, napi_callback_info info) {
     Vector4 v = Vector4_from_js(env, args[0]);
 
     float result = Vector4LengthSqr(v);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector4DotProduct(napi_env env, napi_callback_info info) {
@@ -21128,7 +21273,9 @@ napi_value BindNode_Vector4DotProduct(napi_env env, napi_callback_info info) {
     Vector4 v2 = Vector4_from_js(env, args[1]);
 
     float result = Vector4DotProduct(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector4Distance(napi_env env, napi_callback_info info) {
@@ -21148,7 +21295,9 @@ napi_value BindNode_Vector4Distance(napi_env env, napi_callback_info info) {
     Vector4 v2 = Vector4_from_js(env, args[1]);
 
     float result = Vector4Distance(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector4DistanceSqr(napi_env env, napi_callback_info info) {
@@ -21168,7 +21317,9 @@ napi_value BindNode_Vector4DistanceSqr(napi_env env, napi_callback_info info) {
     Vector4 v2 = Vector4_from_js(env, args[1]);
 
     float result = Vector4DistanceSqr(v1, v2);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_Vector4Scale(napi_env env, napi_callback_info info) {
@@ -21392,7 +21543,9 @@ napi_value BindNode_Vector4Equals(napi_env env, napi_callback_info info) {
     Vector4 q = Vector4_from_js(env, args[1]);
 
     int result = Vector4Equals(p, q);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_MatrixDeterminant(napi_env env, napi_callback_info info) {
@@ -21410,7 +21563,9 @@ napi_value BindNode_MatrixDeterminant(napi_env env, napi_callback_info info) {
     Matrix mat = Matrix_from_js(env, args[0]);
 
     float result = MatrixDeterminant(mat);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_MatrixTrace(napi_env env, napi_callback_info info) {
@@ -21428,7 +21583,9 @@ napi_value BindNode_MatrixTrace(napi_env env, napi_callback_info info) {
     Matrix mat = Matrix_from_js(env, args[0]);
 
     float result = MatrixTrace(mat);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_MatrixTranspose(napi_env env, napi_callback_info info) {
@@ -21854,12 +22011,19 @@ napi_value BindNode_QuaternionAdd(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     Quaternion result = QuaternionAdd(q1, q2);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionAddValue(napi_env env, napi_callback_info info) {
@@ -21874,14 +22038,19 @@ napi_value BindNode_QuaternionAddValue(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     double temp_add;
     napi_get_value_double(env, args[1], &temp_add);
     float add = (float)temp_add;
 
     Quaternion result = QuaternionAddValue(q, add);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionSubtract(napi_env env, napi_callback_info info) {
@@ -21896,12 +22065,19 @@ napi_value BindNode_QuaternionSubtract(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     Quaternion result = QuaternionSubtract(q1, q2);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionSubtractValue(napi_env env, napi_callback_info info) {
@@ -21916,19 +22092,27 @@ napi_value BindNode_QuaternionSubtractValue(napi_env env, napi_callback_info inf
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     double temp_sub;
     napi_get_value_double(env, args[1], &temp_sub);
     float sub = (float)temp_sub;
 
     Quaternion result = QuaternionSubtractValue(q, sub);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionIdentity(napi_env env, napi_callback_info info) {
     Quaternion result = QuaternionIdentity();
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionLength(napi_env env, napi_callback_info info) {
@@ -21943,10 +22127,14 @@ napi_value BindNode_QuaternionLength(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     float result = QuaternionLength(q);
-    return float_to_js(env, result);
+    napi_value jsResult;
+    napi_create_double(env, (double)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_QuaternionNormalize(napi_env env, napi_callback_info info) {
@@ -21961,10 +22149,15 @@ napi_value BindNode_QuaternionNormalize(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Quaternion result = QuaternionNormalize(q);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionInvert(napi_env env, napi_callback_info info) {
@@ -21979,10 +22172,15 @@ napi_value BindNode_QuaternionInvert(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Quaternion result = QuaternionInvert(q);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionMultiply(napi_env env, napi_callback_info info) {
@@ -21997,12 +22195,19 @@ napi_value BindNode_QuaternionMultiply(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     Quaternion result = QuaternionMultiply(q1, q2);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionScale(napi_env env, napi_callback_info info) {
@@ -22017,14 +22222,19 @@ napi_value BindNode_QuaternionScale(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     double temp_mul;
     napi_get_value_double(env, args[1], &temp_mul);
     float mul = (float)temp_mul;
 
     Quaternion result = QuaternionScale(q, mul);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionDivide(napi_env env, napi_callback_info info) {
@@ -22039,12 +22249,19 @@ napi_value BindNode_QuaternionDivide(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     Quaternion result = QuaternionDivide(q1, q2);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionLerp(napi_env env, napi_callback_info info) {
@@ -22059,16 +22276,23 @@ napi_value BindNode_QuaternionLerp(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     double temp_amount;
     napi_get_value_double(env, args[2], &temp_amount);
     float amount = (float)temp_amount;
 
     Quaternion result = QuaternionLerp(q1, q2, amount);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionNlerp(napi_env env, napi_callback_info info) {
@@ -22083,16 +22307,23 @@ napi_value BindNode_QuaternionNlerp(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     double temp_amount;
     napi_get_value_double(env, args[2], &temp_amount);
     float amount = (float)temp_amount;
 
     Quaternion result = QuaternionNlerp(q1, q2, amount);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionSlerp(napi_env env, napi_callback_info info) {
@@ -22107,16 +22338,23 @@ napi_value BindNode_QuaternionSlerp(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
     double temp_amount;
     napi_get_value_double(env, args[2], &temp_amount);
     float amount = (float)temp_amount;
 
     Quaternion result = QuaternionSlerp(q1, q2, amount);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionCubicHermiteSpline(napi_env env, napi_callback_info info) {
@@ -22131,20 +22369,31 @@ napi_value BindNode_QuaternionCubicHermiteSpline(napi_env env, napi_callback_inf
         return undefined;
     }
 
-    Quaternion q1 = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q1;
+    memset(&q1, 0, sizeof(q1));
 
-    Quaternion outTangent1 = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion outTangent1;
+    memset(&outTangent1, 0, sizeof(outTangent1));
 
-    Quaternion q2 = Quaternion_from_js(env, args[2]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q2;
+    memset(&q2, 0, sizeof(q2));
 
-    Quaternion inTangent2 = Quaternion_from_js(env, args[3]);
+    // Warning: No conversion available for Quaternion
+    Quaternion inTangent2;
+    memset(&inTangent2, 0, sizeof(inTangent2));
 
     double temp_t;
     napi_get_value_double(env, args[4], &temp_t);
     float t = (float)temp_t;
 
     Quaternion result = QuaternionCubicHermiteSpline(q1, outTangent1, q2, inTangent2, t);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionFromVector3ToVector3(napi_env env, napi_callback_info info) {
@@ -22164,7 +22413,10 @@ napi_value BindNode_QuaternionFromVector3ToVector3(napi_env env, napi_callback_i
     Vector3 to = Vector3_from_js(env, args[1]);
 
     Quaternion result = QuaternionFromVector3ToVector3(from, to);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionFromMatrix(napi_env env, napi_callback_info info) {
@@ -22182,7 +22434,10 @@ napi_value BindNode_QuaternionFromMatrix(napi_env env, napi_callback_info info) 
     Matrix mat = Matrix_from_js(env, args[0]);
 
     Quaternion result = QuaternionFromMatrix(mat);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionToMatrix(napi_env env, napi_callback_info info) {
@@ -22197,7 +22452,9 @@ napi_value BindNode_QuaternionToMatrix(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Matrix result = QuaternionToMatrix(q);
     return Matrix_to_js(env, result);
@@ -22222,7 +22479,10 @@ napi_value BindNode_QuaternionFromAxisAngle(napi_env env, napi_callback_info inf
     float angle = (float)temp_angle;
 
     Quaternion result = QuaternionFromAxisAngle(axis, angle);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionToAxisAngle(napi_env env, napi_callback_info info) {
@@ -22237,13 +22497,15 @@ napi_value BindNode_QuaternionToAxisAngle(napi_env env, napi_callback_info info)
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Vector3 outAxis_value = Vector3_from_js(env, args[1]);
     Vector3 * outAxis = &outAxis_value;
 
-    float outAngle_value = float_from_js(env, args[2]);
-    float * outAngle = &outAngle_value;
+    // Warning: No conversion available for float
+    float * outAngle = NULL;
 
     QuaternionToAxisAngle(q, outAxis, outAngle);
     napi_value jsResult;
@@ -22276,7 +22538,10 @@ napi_value BindNode_QuaternionFromEuler(napi_env env, napi_callback_info info) {
     float roll = (float)temp_roll;
 
     Quaternion result = QuaternionFromEuler(pitch, yaw, roll);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionToEuler(napi_env env, napi_callback_info info) {
@@ -22291,7 +22556,9 @@ napi_value BindNode_QuaternionToEuler(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Vector3 result = QuaternionToEuler(q);
     return Vector3_to_js(env, result);
@@ -22309,12 +22576,17 @@ napi_value BindNode_QuaternionTransform(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion q = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     Matrix mat = Matrix_from_js(env, args[1]);
 
     Quaternion result = QuaternionTransform(q, mat);
-    return Quaternion_to_js(env, result);
+    // TODO: Handle return type Quaternion
+    napi_value jsResult;
+    napi_get_null(env, &jsResult);
+    return jsResult; // Placeholder
 }
 
 napi_value BindNode_QuaternionEquals(napi_env env, napi_callback_info info) {
@@ -22329,12 +22601,18 @@ napi_value BindNode_QuaternionEquals(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    Quaternion p = Quaternion_from_js(env, args[0]);
+    // Warning: No conversion available for Quaternion
+    Quaternion p;
+    memset(&p, 0, sizeof(p));
 
-    Quaternion q = Quaternion_from_js(env, args[1]);
+    // Warning: No conversion available for Quaternion
+    Quaternion q;
+    memset(&q, 0, sizeof(q));
 
     int result = QuaternionEquals(p, q);
-    return int_to_js(env, result);
+    napi_value jsResult;
+    napi_create_int32(env, (int32_t)result, &jsResult);
+    return jsResult;
 }
 
 napi_value BindNode_MatrixDecompose(napi_env env, napi_callback_info info) {
@@ -22354,8 +22632,8 @@ napi_value BindNode_MatrixDecompose(napi_env env, napi_callback_info info) {
     Vector3 translation_value = Vector3_from_js(env, args[1]);
     Vector3 * translation = &translation_value;
 
-    Quaternion rotation_value = Quaternion_from_js(env, args[2]);
-    Quaternion * rotation = &rotation_value;
+    // Warning: No conversion available for Quaternion
+    Quaternion * rotation = NULL;
 
     Vector3 scale_value = Vector3_from_js(env, args[3]);
     Vector3 * scale = &scale_value;

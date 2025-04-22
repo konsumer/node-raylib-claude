@@ -3,6 +3,11 @@ project(node-raylib)
 
 include_directories(${CMAKE_JS_INC})
 
+if(POLICY CMP0135)
+    cmake_policy(SET CMP0135 NEW)
+    set(CMAKE_POLICY_DEFAULT_CMP0135 NEW)
+endif()
+
 include(FetchContent)
 FetchContent_Declare(
     raylib

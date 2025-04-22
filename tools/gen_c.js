@@ -1,4 +1,4 @@
-// this will generate the NAPI C interface for node
+// improved NAPI C interface generator for node-raylib
 
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -12,6 +12,15 @@ const structTypesNeeded = new Set()
 raylibJson.structs.forEach((struct) => {
   structTypesNeeded.add(struct.name)
 })
+
+// Map for type aliases to their base types - we'll populate this after
+const typeAliases = new Map()
+
+// Define known type aliases in raylib
+typeAliases.set('Texture2D', 'Texture')
+typeAliases.set('TextureCubemap', 'Texture')
+typeAliases.set('RenderTexture2D', 'RenderTexture')
+typeAliases.set('Camera', 'Camera3D')
 
 // Scan function parameters and return types to find additional struct types
 raylibJson.functions.forEach((func) => {
@@ -63,6 +72,10 @@ function sanitizeTypeName(typeName) {
   return typeName.replace(/[^a-zA-Z0-9_]/g, '_')
 }
 
+// Get base type for aliased types
+function getBaseType(typeName) {
+  return typeAliases.get(typeName) || typeName
+}
 
 // Generated C file header
 let bindingsSource = `#include <node_api.h>
@@ -88,14 +101,29 @@ napi_value CreateString(napi_env env, const char* value) {
 // Forward declarations for struct conversions
 `
 
+// Add type alias documentation
+bindingsSource += `// Type aliases in raylib - we reuse conversion functions
+// Texture2D = Texture
+// TextureCubemap = Texture
+// Camera = Camera3D
+// RenderTexture2D = RenderTexture
+
+`
+
 // Generate struct conversion forward declarations
 structTypesNeeded.forEach((structType) => {
   // Avoid generating void_to_js and void_from_js functions
   // Also skip empty strings and sanitize function names
   if (structType !== 'void' && structType !== '') {
-    const sanitizedType = sanitizeTypeName(structType)
-    bindingsSource += `${structType} ${sanitizedType}_from_js(napi_env env, napi_value jsObj);\n`
-    bindingsSource += `napi_value ${sanitizedType}_to_js(napi_env env, ${structType} data);\n`
+    // Use the base type if it's an alias
+    const baseType = getBaseType(structType)
+    const sanitizedType = sanitizeTypeName(baseType)
+
+    // Only generate declarations for base types, not aliases
+    if (baseType === structType) {
+      bindingsSource += `${structType} ${sanitizedType}_from_js(napi_env env, napi_value jsObj);\n`
+      bindingsSource += `napi_value ${sanitizedType}_to_js(napi_env env, ${structType} data);\n`
+    }
   }
 })
 
@@ -164,9 +192,10 @@ function generateStructs() {
         structsCode += `        napi_get_value_string_utf8(env, prop, NULL, 0, &str_len);\n`
         structsCode += `        result.${field.name} = (char*)malloc(str_len + 1);\n`
         structsCode += `        napi_get_value_string_utf8(env, prop, (char*)result.${field.name}, str_len + 1, &str_len);\n`
-      } else if (definedStructs.has(field.type)) {
-        // Only use _from_js for structs we know about
-        const fieldSanitizedType = sanitizeTypeName(field.type)
+      } else if (definedStructs.has(field.type) || typeAliases.has(field.type)) {
+        // Use the base type's conversion function for aliases
+        const baseType = getBaseType(field.type)
+        const fieldSanitizedType = sanitizeTypeName(baseType)
         structsCode += `        result.${field.name} = ${fieldSanitizedType}_from_js(env, prop);\n`
       } else if (field.type.includes('*')) {
         // For pointer fields in from_js
@@ -198,7 +227,7 @@ function generateStructs() {
         structsCode += `        // Set default NULL for pointer type ${field.type}\n`
         structsCode += `        result.${field.name} = NULL;\n`
       } else {
-        structsCode += `        // TODO: Set default for ${field.type}\n`
+        structsCode += `        // Default for ${field.type}\n`
         structsCode += `        memset(&result.${field.name}, 0, sizeof(result.${field.name}));\n`
       }
       structsCode += `    }\n\n`
@@ -229,9 +258,10 @@ function generateStructs() {
         structsCode += `    } else {\n`
         structsCode += `        napi_get_null(env, &prop);\n`
         structsCode += `    }\n`
-      } else if (definedStructs.has(field.type)) {
-        // Only use _to_js for structs we know about
-        const fieldSanitizedType = sanitizeTypeName(field.type)
+      } else if (definedStructs.has(field.type) || typeAliases.has(field.type)) {
+        // Use the base type's conversion function for aliases
+        const baseType = getBaseType(field.type)
+        const fieldSanitizedType = sanitizeTypeName(baseType)
         structsCode += `    prop = ${fieldSanitizedType}_to_js(env, data.${field.name});\n`
       } else if (field.type.includes('*')) {
         // For pointer fields in to_js
@@ -254,8 +284,26 @@ function generateStructs() {
     structsCode += '}\n\n'
   })
 
+  // Generate struct alias function declarations
+  for (const [alias, baseType] of typeAliases.entries()) {
+    if (definedStructs.has(baseType)) {
+      const sanitizedBaseType = sanitizeTypeName(baseType)
+      structsCode += `// Type alias - ${alias} uses ${baseType}'s conversion functions\n`;
+      structsCode += `${alias} ${alias}_from_js(napi_env env, napi_value jsObj) {\n`;
+      structsCode += `    return ${sanitizedBaseType}_from_js(env, jsObj);\n`;
+      structsCode += `}\n\n`;
+      structsCode += `napi_value ${alias}_to_js(napi_env env, ${alias} data) {\n`;
+      structsCode += `    return ${sanitizedBaseType}_to_js(env, data);\n`;
+      structsCode += `}\n\n`;
+    }
+  }
+
   // Generate stub conversions for structs we need but don't have full definitions for
   const definedStructNames = new Set(raylibJson.structs.map((struct) => struct.name))
+  // Also consider aliases as defined
+  for (const alias of typeAliases.keys()) {
+    definedStructNames.add(alias)
+  }
 
   structTypesNeeded.forEach((structType) => {
     if (!definedStructNames.has(structType) && structType !== '' && structType !== 'void') {
@@ -291,6 +339,10 @@ function generateFunctions() {
 
   // Set of defined struct types for checking
   const definedStructs = new Set(raylibJson.structs.map((struct) => struct.name))
+  // Also consider aliases as defined
+  for (const alias of typeAliases.keys()) {
+    definedStructs.add(alias)
+  }
 
   // Add special handling for void* type
   bindingsSource += `// Special handler for void* type\n`
@@ -395,10 +447,11 @@ function generateFunctions() {
         // Handle pointers to struct types
         else if (type.endsWith('*') && !type.startsWith('const char') && !type.startsWith('char')) {
           const structType = type.replace('*', '').trim()
-          const sanitizedStructType = sanitizeTypeName(structType)
+          const baseType = getBaseType(structType)
+          const sanitizedStructType = sanitizeTypeName(baseType)
 
           // Check if we have a defined conversion for this struct
-          if (structTypesNeeded.has(structType)) {
+          if (definedStructs.has(structType)) {
             functionsCode += `    ${structType} ${sanitizedParamName}_value = ${sanitizedStructType}_from_js(env, args[${index}]);\n`
             functionsCode += `    ${type} ${sanitizedParamName} = &${sanitizedParamName}_value;\n\n`
           } else {
@@ -408,9 +461,12 @@ function generateFunctions() {
         }
         // Handle struct types passed by value
         else if (!type.includes('*')) {
+          // Get the base type if it's an alias
+          const baseType = getBaseType(type)
+
           // Check if we have a defined conversion for this struct
-          if (structTypesNeeded.has(type)) {
-            const sanitizedStructType = sanitizeTypeName(type)
+          if (definedStructs.has(type)) {
+            const sanitizedStructType = sanitizeTypeName(baseType)
             functionsCode += `    ${type} ${sanitizedParamName} = ${sanitizedStructType}_from_js(env, args[${index}]);\n\n`
           } else {
             functionsCode += `    // Warning: No conversion available for ${type}\n`
@@ -469,10 +525,11 @@ function generateFunctions() {
     // Handle return value
     if (funcDef.returnType && funcDef.returnType !== 'void') {
       const returnType = funcDef.returnType.trim()
+      const baseReturnType = getBaseType(returnType)
 
-      // Handle known struct types
-      if (structTypesNeeded.has(returnType)) {
-        const sanitizedReturnType = sanitizeTypeName(returnType)
+      // Handle known struct types (including aliases)
+      if (definedStructs.has(returnType)) {
+        const sanitizedReturnType = sanitizeTypeName(baseReturnType)
         functionsCode += `    return ${sanitizedReturnType}_to_js(env, result);\n`
       }
       // Handle floating point types
@@ -580,4 +637,4 @@ bindingsSource += generateModuleInit(functionRegistrations)
 
 // Write the generated code to file
 await writeFile(path.join(fileURLToPath(import.meta.url), '..', '..', 'src', 'node-raylib.c'), bindingsSource)
-console.log('Raylib N-API bindings generated successfully!')
+console.log('Improved Raylib N-API bindings generated successfully!')

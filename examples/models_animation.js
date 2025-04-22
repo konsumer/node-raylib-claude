@@ -15,21 +15,21 @@
 *
 ********************************************************************************************
 *
-*   NOTE: To export a model from blender, make sure it is not posed, the vertices need to be 
-*         in the same position as they would be in edit mode and the scale of your models is 
+*   NOTE: To export a model from blender, make sure it is not posed, the vertices need to be
+*         in the same position as they would be in edit mode and the scale of your models is
 *         set to 0. Scaling can be done from the export menu.
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
-  BeginDrawing, 
-  EndDrawing, 
+import {
+  InitWindow,
+  CloseWindow,
+  BeginDrawing,
+  EndDrawing,
   BeginMode3D,
   EndMode3D,
-  ClearBackground, 
-  DrawText, 
+  ClearBackground,
+  DrawText,
   DrawModelEx,
   DrawCube,
   DrawGrid,
@@ -110,11 +110,11 @@ while (!WindowShouldClose())        // Detect window close button or ESC key
         BeginMode3D(camera)
 
             DrawModelEx(
-                model, 
-                position, 
-                { x: 1.0, y: 0.0, z: 0.0 }, 
-                -90.0, 
-                { x: 1.0, y: 1.0, z: 1.0 }, 
+                model,
+                position,
+                { x: 1.0, y: 0.0, z: 0.0 },
+                -90.0,
+                { x: 1.0, y: 1.0, z: 1.0 },
                 WHITE
             )
 

@@ -67,7 +67,7 @@ const msg = "Signed Distance Fields"
 
 // Loading file to memory
 let fileSize = 0
-const fileData = LoadFileData("resources/anonymous_pro_bold.ttf", fileSize)
+const fileData = LoadFileData("examples/resources/anonymous_pro_bold.ttf", fileSize)
 
 // Define platform-specific GLSL version
 let GLSL_VERSION = 330
@@ -76,7 +76,7 @@ if (process.platform === 'android' || process.platform === 'web') {
 }
 
 // Default font generation from TTF font
-const fontDefault = { 
+const fontDefault = {
   baseSize: 16,
   glyphCount: 95,
   glyphs: null,
@@ -110,7 +110,7 @@ UnloadImage(sdfAtlas)
 UnloadFileData(fileData)      // Free memory from loaded file
 
 // Load SDF required shader (we use default vertex shader)
-const shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/sdf.fs", GLSL_VERSION))
+const shader = LoadShader(0, TextFormat("examples/resources/shaders/glsl%i/sdf.fs", GLSL_VERSION))
 SetTextureFilter(fontSDF.texture, TEXTURE_FILTER_BILINEAR)    // Required for SDF font
 
 const fontPosition = { x: 40, y: screenHeight/2.0 - 50 }

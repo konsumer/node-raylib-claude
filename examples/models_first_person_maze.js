@@ -13,14 +13,14 @@
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
-  BeginDrawing, 
-  EndDrawing, 
+import {
+  InitWindow,
+  CloseWindow,
+  BeginDrawing,
+  EndDrawing,
   BeginMode3D,
   EndMode3D,
-  ClearBackground, 
+  ClearBackground,
   DrawFPS,
   DrawModel,
   DrawTextureEx,
@@ -41,7 +41,7 @@ import {
   CheckCollisionCircleRec,
   GetScreenWidth,
   GetScreenHeight,
-  SetTargetFPS, 
+  SetTargetFPS,
   WindowShouldClose,
   CAMERA_FIRST_PERSON,
   CAMERA_PERSPECTIVE,
@@ -75,10 +75,15 @@ const model = LoadModelFromMesh(mesh)
 
 // NOTE: By default each cube is mapped to one part of texture atlas
 const texture = LoadTexture("examples/resources/cubicmap_atlas.png")    // Load map texture
-model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture    // Set map diffuse texture
+
+// TODO: some problem with these
+// model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture    // Set map diffuse texture
 
 // Get map image data to be used for collision detection
-const mapPixels = LoadImageColors(imMap)
+// const mapPixels = LoadImageColors(imMap)
+
+const mapPixels=[]
+
 UnloadImage(imMap)             // Unload image from RAM
 
 const mapPosition = { x: -16.0, y: 0.0, z: -8.0 }  // Set model position
@@ -115,15 +120,15 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
     // TODO: Improvement: Just check player surrounding cells for collision
     for (let y = 0; y < cubicmap.height; y++) {
         for (let x = 0; x < cubicmap.width; x++) {
-            if ((mapPixels[y*cubicmap.width + x].r === 255) &&       // Collision: white pixel, only check R channel
+            if ((mapPixels[y*cubicmap.width + x]?.r === 255) &&       // Collision: white pixel, only check R channel
                 (CheckCollisionCircleRec(
-                    playerPos, 
+                    playerPos,
                     playerRadius,
-                    { 
-                        x: mapPosition.x - 0.5 + x*1.0, 
-                        y: mapPosition.z - 0.5 + y*1.0, 
-                        width: 1.0, 
-                        height: 1.0 
+                    {
+                        x: mapPosition.x - 0.5 + x*1.0,
+                        y: mapPosition.z - 0.5 + y*1.0,
+                        width: 1.0,
+                        height: 1.0
                     }
                 ))) {
                 // Collision detected, reset camera position

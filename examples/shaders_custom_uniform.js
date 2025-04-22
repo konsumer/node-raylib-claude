@@ -88,15 +88,15 @@ const camera = {
     projection: CAMERA_PERSPECTIVE           // Camera projection type
 }
 
-const model = LoadModel("resources/models/barracks.obj")                   // Load OBJ model
-const texture = LoadTexture("resources/models/barracks_diffuse.png")   // Load model texture (diffuse map)
-model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture                     // Set model diffuse texture
+const model = LoadModel("examples/resources/models/barracks.obj")                   // Load OBJ model
+const texture = LoadTexture("examples/resources/models/barracks_diffuse.png")   // Load model texture (diffuse map)
+// model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture                     // Set model diffuse texture
 
 const position = { x: 0.0, y: 0.0, z: 0.0 }                                    // Set model position
 
 // Load postprocessing shader
 // NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
-const shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/swirl.fs", GLSL_VERSION))
+const shader = LoadShader(0, TextFormat("examples/resources/shaders/glsl%i/swirl.fs", GLSL_VERSION))
 
 // Get variable (uniform) location on the shader to connect with the program
 // NOTE: If uniform variable could not be found in the shader, function returns -1
@@ -116,7 +116,7 @@ while (!WindowShouldClose())        // Detect window close button or ESC key
     // Update
     //----------------------------------------------------------------------------------
     UpdateCamera(camera, CAMERA_ORBITAL)
-    
+
     const mousePosition = GetMousePosition()
 
     swirlCenter[0] = mousePosition.x
@@ -146,9 +146,9 @@ while (!WindowShouldClose())        // Detect window close button or ESC key
         BeginShaderMode(shader)
             // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
             DrawTextureRec(
-                target.texture, 
-                { x: 0, y: 0, width: target.texture.width, height: -target.texture.height }, 
-                { x: 0, y: 0 }, 
+                target.texture,
+                { x: 0, y: 0, width: target.texture.width, height: -target.texture.height },
+                { x: 0, y: 0 },
                 WHITE
             )
         EndShaderMode()

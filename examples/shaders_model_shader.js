@@ -77,15 +77,16 @@ const camera = {
     projection: CAMERA_PERSPECTIVE           // Camera projection type
 }
 
-const model = LoadModel("resources/models/watermill.obj")                   // Load OBJ model
-const texture = LoadTexture("resources/models/watermill_diffuse.png")   // Load model texture
+const model = LoadModel("examples/resources/models/watermill.obj")                   // Load OBJ model
+const texture = LoadTexture("examples/resources/models/watermill_diffuse.png")   // Load model texture
 
 // Load shader for model
 // NOTE: Defining 0 (NULL) for vertex shader forces usage of internal default vertex shader
-const shader = LoadShader(0, TextFormat("resources/shaders/glsl%i/grayscale.fs", GLSL_VERSION))
+const shader = LoadShader(0, TextFormat("examples/resources/shaders/glsl%i/grayscale.fs", GLSL_VERSION))
 
-model.materials[0].shader = shader                 // Set shader effect to 3d model
-model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture // Bind texture to model
+// TODO: this is broken
+// model.materials[0].shader = shader                 // Set shader effect to 3d model
+// model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = texture // Bind texture to model
 
 const position = { x: 0.0, y: 0.0, z: 0.0 }    // Set model position
 
