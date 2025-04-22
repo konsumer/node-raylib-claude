@@ -5,9 +5,11 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { raylib as raylibJson } from '@raylib/api'
 
+const raylibVersion = raylibJson.defines.find(def => def.name === 'RAYLIB_VERSION').value
+
 // Generate a clean JS interface
-let jsCode = `// Auto-generated raylib bindings for Node.js
-// Generated from @raylib/api ${raylibJson.version}
+let jsCode = `// Auto-generated NAPI raylib bindings
+// Generated from raylib ${raylibVersion}
 
 import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
@@ -27,14 +29,14 @@ raylibJson.functions.forEach(func => {
 // Generate convenient constants for enum values
 raylibJson.enums.forEach(enumDef => {
   jsCode += `\n// ${enumDef.name} enum values\n`
-  
+
   // Export direct constants for each enum value
   enumDef.values.forEach(value => {
     jsCode += `export const ${value.name} = ${value.value};\n`
   })
 })
 
-// Add common color constants 
+// Add common color constants
 jsCode += `\n// Common color constants\n`
 jsCode += `export const RED = { r: 255, g: 0, b: 0, a: 255 };\n`
 jsCode += `export const GREEN = { r: 0, g: 255, b: 0, a: 255 };\n`
