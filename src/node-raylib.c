@@ -7362,8 +7362,8 @@ napi_value BindNode_MemRealloc(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void_ptr ptr_value = void_from_js(env, args[0]);
-    void * ptr = ptr_value;
+    void ptr_value = void_from_js(env, args[0]);
+    void * ptr = &ptr_value;
 
     unsigned int size;
     napi_get_value_int32(env, args[1], (int32_t*)&size);
@@ -7387,8 +7387,8 @@ napi_value BindNode_MemFree(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void_ptr ptr_value = void_from_js(env, args[0]);
-    void * ptr = ptr_value;
+    void ptr_value = void_from_js(env, args[0]);
+    void * ptr = &ptr_value;
 
     MemFree(ptr);
     napi_value jsResult;
@@ -7562,8 +7562,8 @@ napi_value BindNode_SaveFileData(napi_env env, napi_callback_info info) {
     char* fileName = (char*)malloc(fileName_len + 1);
     napi_get_value_string_utf8(env, args[0], fileName, fileName_len + 1, &fileName_len);
 
-    void_ptr data_value = void_from_js(env, args[1]);
-    void * data = data_value;
+    void data_value = void_from_js(env, args[1]);
+    void * data = &data_value;
 
     int dataSize;
     napi_get_value_int32(env, args[2], (int32_t*)&dataSize);
@@ -13956,8 +13956,8 @@ napi_value BindNode_GetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void_ptr srcPtr_value = void_from_js(env, args[0]);
-    void * srcPtr = srcPtr_value;
+    void srcPtr_value = void_from_js(env, args[0]);
+    void * srcPtr = &srcPtr_value;
 
     int format;
     napi_get_value_int32(env, args[1], (int32_t*)&format);
@@ -13978,8 +13978,8 @@ napi_value BindNode_SetPixelColor(napi_env env, napi_callback_info info) {
         return undefined;
     }
 
-    void_ptr dstPtr_value = void_from_js(env, args[0]);
-    void * dstPtr = dstPtr_value;
+    void dstPtr_value = void_from_js(env, args[0]);
+    void * dstPtr = &dstPtr_value;
 
     Color color = Color_from_js(env, args[1]);
 

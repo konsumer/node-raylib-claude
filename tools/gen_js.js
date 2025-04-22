@@ -34,41 +34,37 @@ raylibJson.enums.forEach(enumDef => {
   })
 })
 
-// Add color definitions
-jsCode += `\n// Color creation helper\n`
-jsCode += `const createColor = (r, g, b, a = 255) => ({ r, g, b, a });\n\n`
-
 // Add common color constants 
-jsCode += `// Common color constants\n`
-jsCode += `export const RED = createColor(255, 0, 0, 255);\n`
-jsCode += `export const GREEN = createColor(0, 255, 0, 255);\n`
-jsCode += `export const BLUE = createColor(0, 0, 255, 255);\n`
-jsCode += `export const BLACK = createColor(0, 0, 0, 255);\n`
-jsCode += `export const WHITE = createColor(255, 255, 255, 255);\n`
-jsCode += `export const RAYWHITE = createColor(245, 245, 245, 255);\n`
-jsCode += `export const LIGHTGRAY = createColor(200, 200, 200, 255);\n`
-jsCode += `export const GRAY = createColor(130, 130, 130, 255);\n`
-jsCode += `export const DARKGRAY = createColor(80, 80, 80, 255);\n`
-jsCode += `export const YELLOW = createColor(255, 255, 0, 255);\n`
-jsCode += `export const GOLD = createColor(255, 203, 0, 255);\n`
-jsCode += `export const ORANGE = createColor(255, 161, 0, 255);\n`
-jsCode += `export const PINK = createColor(255, 109, 194, 255);\n`
-jsCode += `export const MAROON = createColor(190, 33, 55, 255);\n`
-jsCode += `export const LIME = createColor(0, 158, 47, 255);\n`
-jsCode += `export const DARKGREEN = createColor(0, 117, 44, 255);\n`
-jsCode += `export const SKYBLUE = createColor(102, 191, 255, 255);\n`
-jsCode += `export const DARKBLUE = createColor(0, 82, 172, 255);\n`
-jsCode += `export const PURPLE = createColor(200, 122, 255, 255);\n`
-jsCode += `export const VIOLET = createColor(135, 60, 190, 255);\n`
-jsCode += `export const DARKPURPLE = createColor(112, 31, 126, 255);\n`
-jsCode += `export const BEIGE = createColor(211, 176, 131, 255);\n`
-jsCode += `export const BROWN = createColor(127, 106, 79, 255);\n`
-jsCode += `export const DARKBROWN = createColor(76, 63, 47, 255);\n`
-jsCode += `export const TRANSPARENT = createColor(0, 0, 0, 0);\n`
+jsCode += `\n// Common color constants\n`
+jsCode += `export const RED = { r: 255, g: 0, b: 0, a: 255 };\n`
+jsCode += `export const GREEN = { r: 0, g: 255, b: 0, a: 255 };\n`
+jsCode += `export const BLUE = { r: 0, g: 0, b: 255, a: 255 };\n`
+jsCode += `export const BLACK = { r: 0, g: 0, b: 0, a: 255 };\n`
+jsCode += `export const WHITE = { r: 255, g: 255, b: 255, a: 255 };\n`
+jsCode += `export const RAYWHITE = { r: 245, g: 245, b: 245, a: 255 };\n`
+jsCode += `export const LIGHTGRAY = { r: 200, g: 200, b: 200, a: 255 };\n`
+jsCode += `export const GRAY = { r: 130, g: 130, b: 130, a: 255 };\n`
+jsCode += `export const DARKGRAY = { r: 80, g: 80, b: 80, a: 255 };\n`
+jsCode += `export const YELLOW = { r: 255, g: 255, b: 0, a: 255 };\n`
+jsCode += `export const GOLD = { r: 255, g: 203, b: 0, a: 255 };\n`
+jsCode += `export const ORANGE = { r: 255, g: 161, b: 0, a: 255 };\n`
+jsCode += `export const PINK = { r: 255, g: 109, b: 194, a: 255 };\n`
+jsCode += `export const MAROON = { r: 190, g: 33, b: 55, a: 255 };\n`
+jsCode += `export const LIME = { r: 0, g: 158, b: 47, a: 255 };\n`
+jsCode += `export const DARKGREEN = { r: 0, g: 117, b: 44, a: 255 };\n`
+jsCode += `export const SKYBLUE = { r: 102, g: 191, b: 255, a: 255 };\n`
+jsCode += `export const DARKBLUE = { r: 0, g: 82, b: 172, a: 255 };\n`
+jsCode += `export const PURPLE = { r: 200, g: 122, b: 255, a: 255 };\n`
+jsCode += `export const VIOLET = { r: 135, g: 60, b: 190, a: 255 };\n`
+jsCode += `export const DARKPURPLE = { r: 112, g: 31, b: 126, a: 255 };\n`
+jsCode += `export const BEIGE = { r: 211, g: 176, b: 131, a: 255 };\n`
+jsCode += `export const BROWN = { r: 127, g: 106, b: 79, a: 255 };\n`
+jsCode += `export const DARKBROWN = { r: 76, g: 63, b: 47, a: 255 };\n`
+jsCode += `export const TRANSPARENT = { r: 0, g: 0, b: 0, a: 0 };\n`
 
 // Export the Color helper
 jsCode += `\n// Export Color helper function\n`
-jsCode += `export const Color = createColor;\n`
+jsCode += `export const Color = (r, g, b, a = 255) => ({ r, g, b, a });\n`
 
 // Write the generated code to file
 await writeFile(path.join(fileURLToPath(import.meta.url), '..', '..', 'index.js'), jsCode)
