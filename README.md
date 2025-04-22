@@ -5,9 +5,9 @@ This is a very light NAPI-based binding for raylib 5.5 that uses modern JavaScri
 ## Features
 
 - Complete bindings for raylib 5.5
-- Uses N-API for ABI stability across Node.js versions
+- Uses N-API for ABI stability across Node.js versions (and even BunJS!)
 - ES Module format for modern JavaScript projects
-- Automated code generation from the raylib API definition
+- Automated code-generation from the [raylib API definition](https://github.com/RobLoach/raylib-api)
 
 ## Installation
 
@@ -18,26 +18,33 @@ npm install raylib
 ## Usage
 
 ```javascript
-import raylib from 'raylib';
+import {
+  InitWindow,
+  WindowShouldClose,
+  SetTargetFPS,
+  CloseWindow,
+  BeginDrawing,
+  ClearBackground,
+  DrawText,
+  EndDrawing,
+  RED,
+  RAYWHITE
+} from 'raylib'
 
 // Initialize window
-raylib.InitWindow(800, 450, "raylib [core] example");
-raylib.SetTargetFPS(60);
-
-// Define colors for easier use
-const RED = { r: 255, g: 0, b: 0, a: 255 };
-const RAYWHITE = { r: 245, g: 245, b: 245, a: 255 };
+InitWindow(800, 450, "raylib [core] example")
+SetTargetFPS(60)
 
 // Main game loop
-while (!raylib.WindowShouldClose()) {
-  raylib.BeginDrawing();
-  raylib.ClearBackground(RAYWHITE);
-  raylib.DrawText("Congrats! You created your first raylib window!", 190, 200, 20, RED);
-  raylib.EndDrawing();
+while (!WindowShouldClose()) {
+  BeginDrawing()
+  ClearBackground(RAYWHITE)
+  DrawText("Congrats! You created your first raylib window!", 190, 200, 20, RED)
+  EndDrawing()
 }
 
 // Close window
-raylib.CloseWindow();
+CloseWindow()
 ```
 
 ## Development

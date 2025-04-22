@@ -40,3 +40,32 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Color Constants**: Standard color constants provided (RED, BLUE, GREEN, etc.)
 - **Color Creation**: Use function `Color(r, g, b, a)` to create color objects
 - **Example**: `const myRed = { r: 255, g: 0, b: 0, a: 255 }` or `const myRed = Color(255, 0, 0, 255)`
+
+## Known Issues
+
+### Audio Bindings
+
+The current audio bindings have critical issues with pointer handling that affect functionality:
+
+1. **Audio Loading Works, Playback Doesn't**:
+   - Sound files load correctly (LoadSound/LoadMusicStream)
+   - But audio doesn't play when PlaySound/PlayMusicStream are called
+   - IsSoundPlaying always returns false
+
+2. **Technical Root Cause**:
+   - The AudioStream struct contains critical pointer fields: `buffer` and `processor`
+   - The current bindings zero out these pointers during JS-to-C conversion
+   - The AudioStream_from_js function contains TODOs for these fields
+   - Without these pointers, audio can't actually play
+
+3. **Potential Segfaults**:
+   - In complex examples, audio operations may cause segfaults
+   - This is due to inconsistent handling of audio resource lifecycle
+   - Global references (global.sound = LoadSound(...)) can help prevent some issues
+
+4. **Fix Required**:
+   - The gen_c.js binding generator needs to be updated to handle pointer fields
+   - Proper reference counting should be implemented for audio resources
+   - Complete the TODOs in AudioStream_from_js and AudioStream_to_js
+
+Until these issues are fixed, avoid demos that rely on audio playback or add clear documentation that audio won't be heard.

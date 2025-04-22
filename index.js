@@ -960,6 +960,3 @@ export const BEIGE = { r: 211, g: 176, b: 131, a: 255 };
 export const BROWN = { r: 127, g: 106, b: 79, a: 255 };
 export const DARKBROWN = { r: 76, g: 63, b: 47, a: 255 };
 export const TRANSPARENT = { r: 0, g: 0, b: 0, a: 0 };
-
-// Export Color helper function
-export const Color = (r, g, b, a = 255) => ({ r, g, b, a });
