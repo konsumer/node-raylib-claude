@@ -1,0 +1,51 @@
+{
+  "name": "raylib",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test",
+    "build": "cmake-js compile",
+    "clean": "cmake-js clean",
+    "generate": "node tools/gen_c.js && node tools/gen_js.js",
+    "start": "node example.js"
+  },
+  "repository": "RobLoach/node-raylib",
+  "bugs": {
+    "url": "https://github.com/RobLoach/node-raylib/issues"
+  },
+  "homepage": "https://github.com/RobLoach/node-raylib",
+  "description": "Node.js bindings for raylib 5.5",
+  "keywords": [
+    "raylib"
+  ],
+  "author": {
+    "name": "Rob Loach",
+    "url": "https://robloach.net"
+  },
+  "contributors": [
+    {
+      "name": "konsumer",
+      "url": "https://keybase.io/konsumer"
+    },
+    {
+      "name": "twuky",
+      "url": "http://tuckie.zone"
+    },
+    {
+      "name": "The 99's Puppycat",
+      "url": "https://github.com/huyhoang160593"
+    }
+  ],
+  "license": "Zlib",
+  "devDependencies": {
+    "@raylib/api": "^5.5.0",
+    "cmake-js": "^7.3.1",
+    "node-addon-api": "^8.3.1"
+  },
+  "binary": {
+    "napi_versions": [
+      4
+    ]
+  }
+}
