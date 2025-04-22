@@ -13,9 +13,9 @@
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
+import {
+  InitWindow,
+  CloseWindow,
   BeginDrawing,
   EndDrawing,
   ClearBackground,
@@ -24,7 +24,7 @@ import {
   DrawPlane,
   DrawCube,
   DrawCubeWires,
-  DrawRectangle, 
+  DrawRectangle,
   DrawRectangleLines,
   DrawText,
   UpdateCamera,
@@ -38,7 +38,7 @@ import {
   RAYWHITE,
   LIGHTGRAY,
   BLUE,
-  LIME, 
+  LIME,
   GOLD,
   MAROON,
   PURPLE,
@@ -91,9 +91,9 @@ let cameraMode = CAMERA_FIRST_PERSON
 
 // Generates some random columns
 const heights = Array(MAX_COLUMNS).fill(0).map(() => GetRandomValue(1, 12))
-const positions = Array(MAX_COLUMNS).fill(0).map(() => ({
+const positions = Array(MAX_COLUMNS).fill(0).map((v, i) => ({
   x: GetRandomValue(-15, 15),
-  y: heights[positions.length]/2.0,
+  y: heights[i]/2.0,
   z: GetRandomValue(-15, 15)
 }))
 const colors = Array(MAX_COLUMNS).fill(0).map(() => ({
@@ -145,7 +145,7 @@ while (!WindowShouldClose())        // Detect window close button or ESC key
             camera.up = { x: 0.0, y: 1.0, z: 0.0 }
             camera.projection = CAMERA_ORTHOGRAPHIC
             camera.fovy = 20.0 // near plane width in CAMERA_ORTHOGRAPHIC
-            
+
             // Note: These camera operations may need implementation or alternatives
             // CameraYaw(&camera, -135 * DEG2RAD, true)
             // CameraPitch(&camera, -45 * DEG2RAD, true, true, false)
@@ -209,25 +209,25 @@ while (!WindowShouldClose())        // Detect window close button or ESC key
         DrawRectangleLines(600, 5, 195, 100, BLUE)
 
         DrawText("Camera status:", 610, 15, 10, BLACK)
-        
+
         let cameraModeName = "CUSTOM"
         if (cameraMode == CAMERA_FREE) cameraModeName = "FREE"
         else if (cameraMode == CAMERA_FIRST_PERSON) cameraModeName = "FIRST_PERSON"
         else if (cameraMode == CAMERA_THIRD_PERSON) cameraModeName = "THIRD_PERSON"
         else if (cameraMode == CAMERA_ORBITAL) cameraModeName = "ORBITAL"
-        
+
         DrawText(`- Mode: ${cameraModeName}`, 610, 30, 10, BLACK)
-        
+
         let projectionName = "CUSTOM"
         if (camera.projection == CAMERA_PERSPECTIVE) projectionName = "PERSPECTIVE"
         else if (camera.projection == CAMERA_ORTHOGRAPHIC) projectionName = "ORTHOGRAPHIC"
-        
+
         DrawText(`- Projection: ${projectionName}`, 610, 45, 10, BLACK)
-        DrawText(TextFormat("- Position: (%06.3f, %06.3f, %06.3f)", 
+        DrawText(TextFormat("- Position: (%06.3f, %06.3f, %06.3f)",
             camera.position.x, camera.position.y, camera.position.z), 610, 60, 10, BLACK)
-        DrawText(TextFormat("- Target: (%06.3f, %06.3f, %06.3f)", 
+        DrawText(TextFormat("- Target: (%06.3f, %06.3f, %06.3f)",
             camera.target.x, camera.target.y, camera.target.z), 610, 75, 10, BLACK)
-        DrawText(TextFormat("- Up: (%06.3f, %06.3f, %06.3f)", 
+        DrawText(TextFormat("- Up: (%06.3f, %06.3f, %06.3f)",
             camera.up.x, camera.up.y, camera.up.z), 610, 90, 10, BLACK)
 
     EndDrawing()

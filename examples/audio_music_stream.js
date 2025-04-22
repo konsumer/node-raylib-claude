@@ -4,18 +4,18 @@
 *
 *   Simple audio example that works with the current bindings
 *
-*   WARNING: This is a simplified version because the Music streaming functions 
+*   WARNING: This is a simplified version because the Music streaming functions
 *   have issues with the current node-raylib bindings. Audio won't actually play.
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
-  BeginDrawing, 
-  EndDrawing, 
-  ClearBackground, 
-  DrawText, 
+import {
+  InitWindow,
+  CloseWindow,
+  BeginDrawing,
+  EndDrawing,
+  ClearBackground,
+  DrawText,
   InitAudioDevice,
   CloseAudioDevice,
   LoadSound,
@@ -23,7 +23,7 @@ import {
   PlaySound,
   StopSound,
   IsKeyPressed,
-  SetTargetFPS, 
+  SetTargetFPS,
   WindowShouldClose,
   KEY_SPACE,
   KEY_P,
@@ -58,7 +58,7 @@ while (!WindowShouldClose())
         PlaySound(global.sound)
         playing = true
     }
-    
+
     if (IsKeyPressed(KEY_P)) {
         if (playing) {
             StopSound(global.sound)
@@ -78,10 +78,6 @@ while (!WindowShouldClose())
 
         DrawText("Press SPACE to PLAY a sound!", 200, 180, 20, LIGHTGRAY)
         DrawText("Press P to PAUSE/RESUME sound", 200, 220, 20, LIGHTGRAY)
-        
-        // Display a notice about the audio binding issue
-        DrawText("NOTE: Audio won't actually play due to binding limitations.", 150, 280, 20, RED)
-        DrawText("See CLAUDE.md or README.md for details.", 180, 310, 20, RED)
 
     EndDrawing()
     //----------------------------------------------------------------------------------

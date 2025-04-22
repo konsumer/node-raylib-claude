@@ -15,15 +15,15 @@
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
-  BeginDrawing, 
-  EndDrawing, 
+import {
+  InitWindow,
+  CloseWindow,
+  BeginDrawing,
+  EndDrawing,
   BeginTextureMode,
   EndTextureMode,
-  ClearBackground, 
-  DrawText, 
+  ClearBackground,
+  DrawText,
   DrawRectangle,
   DrawRectangleRec,
   DrawRectangleLines,
@@ -51,6 +51,8 @@ import {
   IsMouseButtonReleased,
   IsMouseButtonPressed,
   IsKeyPressed,
+  SetTargetFPS,
+  WindowShouldClose,
   KEY_RIGHT,
   KEY_LEFT,
   KEY_C,
@@ -214,22 +216,22 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
 
     // NOTE: Render texture must be y-flipped due to default OpenGL coordinates (left-bottom)
     DrawTextureRec(
-        target.texture, 
-        { 
-            x: 0, 
-            y: 0, 
-            width: target.texture.width, 
-            height: -target.texture.height 
-        }, 
-        { x: 0, y: 0 }, 
+        target.texture,
+        {
+            x: 0,
+            y: 0,
+            width: target?.texture?.width,
+            height: -target?.texture?.height
+        },
+        { x: 0, y: 0 },
         WHITE
     )
 
     // Draw drawing circle for reference
     if (mousePos.y > 50) {
-        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT)) 
+        if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
             DrawCircleLines(Math.floor(mousePos.x), Math.floor(mousePos.y), brushSize, GRAY)
-        else 
+        else
             DrawCircle(GetMouseX(), GetMouseY(), brushSize, colors[colorSelected])
     }
 
@@ -244,10 +246,10 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
     if (colorMouseHover >= 0) DrawRectangleRec(colorsRecs[colorMouseHover], Fade(WHITE, 0.6))
 
     DrawRectangleLinesEx({
-        x: colorsRecs[colorSelected].x - 2, 
+        x: colorsRecs[colorSelected].x - 2,
         y: colorsRecs[colorSelected].y - 2,
-        width: colorsRecs[colorSelected].width + 4, 
-        height: colorsRecs[colorSelected].height + 4 
+        width: colorsRecs[colorSelected].width + 4,
+        height: colorsRecs[colorSelected].height + 4
     }, 2, BLACK)
 
     // Draw save image button

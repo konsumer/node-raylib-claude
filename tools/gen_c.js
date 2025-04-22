@@ -3,7 +3,7 @@
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { raylib as raylibJson } from '@raylib/api'
+import raylibJson from './api.js'
 
 // First, build a set of all struct types that need conversions
 const structTypesNeeded = new Set()
@@ -31,7 +31,7 @@ raylibJson.functions.forEach((func) => {
       if (param.type.trim() === '...') {
         return
       }
-      
+
       if (!isBasicType(param.type) && param.type.trim() !== 'void') {
         const cleanType = cleanTypeName(param.type)
         if (!cleanType.includes('*')) {
@@ -63,9 +63,12 @@ function sanitizeTypeName(typeName) {
   return typeName.replace(/[^a-zA-Z0-9_]/g, '_')
 }
 
+
 // Generated C file header
 let bindingsSource = `#include <node_api.h>
 #include <raylib.h>
+#include <raymath.h>
+#include <rlgl.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -288,7 +291,7 @@ function generateFunctions() {
 
   // Set of defined struct types for checking
   const definedStructs = new Set(raylibJson.structs.map((struct) => struct.name))
-  
+
   // Add special handling for void* type
   bindingsSource += `// Special handler for void* type\n`
   bindingsSource += `void* void_ptr_from_js(napi_env env, napi_value jsObj) {\n`
@@ -313,7 +316,7 @@ function generateFunctions() {
   bindingsSource += `    }\n`
   bindingsSource += `    return result;\n`
   bindingsSource += `}\n\n`
-  
+
   // We only need the void_ptr_from_js function, not any alias
   bindingsSource += `// Special handler for functions needing void* returns\n`
   bindingsSource += `typedef void* void_ptr;\n\n`
@@ -330,10 +333,10 @@ function generateFunctions() {
       // Filter out variadic (...) parameters for parameter count checking
       const regularParams = funcDef.params.filter(param => param.type.trim() !== '...')
       const hasVariadic = funcDef.params.some(param => param.type.trim() === '...')
-      
+
       // For variadic functions, we accept any number of arguments >= regularParams.length
       const minParams = regularParams.length
-      
+
       functionsCode += `    size_t argc = ${funcDef.params.length};\n`
       functionsCode += `    napi_value args[${funcDef.params.length}];\n`
       functionsCode += '    napi_get_cb_info(env, info, &argc, args, NULL, NULL);\n\n'
@@ -350,7 +353,7 @@ function generateFunctions() {
       funcDef.params.forEach((param, index) => {
         const type = param.type.trim()
         const sanitizedParamName = sanitizeTypeName(param.name)
-        
+
         // Skip ellipsis parameters
         if (type === '...') {
           return;
@@ -438,7 +441,7 @@ function generateFunctions() {
     if (funcDef.params && funcDef.params.length > 0) {
       // Filter out ellipsis parameters before iterating
       const regularParams = funcDef.params.filter(param => param.type.trim() !== '...')
-      
+
       regularParams.forEach((param, index) => {
         functionsCode += sanitizeTypeName(param.name)
         if (index < regularParams.length - 1) {
@@ -455,7 +458,7 @@ function generateFunctions() {
         if (param.type.trim() === '...') {
           return;
         }
-        
+
         const sanitizedParamName = sanitizeTypeName(param.name)
         if (param.type === 'const char *' || param.type === 'char *') {
           functionsCode += `    free(${sanitizedParamName});\n`
@@ -560,13 +563,13 @@ const { functionsCode: origFunctionsCode, functionDeclarations, functionRegistra
 // Fix all problematic code patterns
 let functionsCode = origFunctionsCode
   // Fix the problematic patterns with void_from_js
-  .replace(/void ptr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* ptr = &ptr_value;/g, 
+  .replace(/void ptr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* ptr = &ptr_value;/g,
       'void* ptr = void_ptr_from_js(env, args[0]);')
-  .replace(/void srcPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* srcPtr = &srcPtr_value;/g, 
+  .replace(/void srcPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* srcPtr = &srcPtr_value;/g,
       'void* srcPtr = void_ptr_from_js(env, args[0]);')
-  .replace(/void dstPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* dstPtr = &dstPtr_value;/g, 
+  .replace(/void dstPtr_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* dstPtr = &dstPtr_value;/g,
       'void* dstPtr = void_ptr_from_js(env, args[0]);')
-  .replace(/void data_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* data = &data_value;/g, 
+  .replace(/void data_value = void_from_js\(env, args\[\d+\]\);(\s+)void \* data = &data_value;/g,
       'void* data = void_ptr_from_js(env, args[1]);');
 
 bindingsSource += functionDeclarations + '\n'

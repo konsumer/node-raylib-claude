@@ -1,5 +1,7 @@
 #include <node_api.h>
 #include <raylib.h>
+#include <raymath.h>
+#include <rlgl.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -85,6 +87,10 @@ AutomationEvent AutomationEvent_from_js(napi_env env, napi_value jsObj);
 napi_value AutomationEvent_to_js(napi_env env, AutomationEvent data);
 AutomationEventList AutomationEventList_from_js(napi_env env, napi_value jsObj);
 napi_value AutomationEventList_to_js(napi_env env, AutomationEventList data);
+float3 float3_from_js(napi_env env, napi_value jsObj);
+napi_value float3_to_js(napi_env env, float3 data);
+float16 float16_from_js(napi_env env, napi_value jsObj);
+napi_value float16_to_js(napi_env env, float16 data);
 RenderTexture2D RenderTexture2D_from_js(napi_env env, napi_value jsObj);
 napi_value RenderTexture2D_to_js(napi_env env, RenderTexture2D data);
 Texture2D Texture2D_from_js(napi_env env, napi_value jsObj);
@@ -113,6 +119,8 @@ Rectangle * Rectangle___from_js(napi_env env, napi_value jsObj);
 napi_value Rectangle___to_js(napi_env env, Rectangle * data);
 AudioCallback AudioCallback_from_js(napi_env env, napi_value jsObj);
 napi_value AudioCallback_to_js(napi_env env, AudioCallback data);
+Quaternion Quaternion_from_js(napi_env env, napi_value jsObj);
+napi_value Quaternion_to_js(napi_env env, Quaternion data);
 
 // Forward declarations for functions
 // Special handler for void* type
@@ -724,6 +732,149 @@ napi_value BindNode_AttachAudioStreamProcessor(napi_env env, napi_callback_info 
 napi_value BindNode_DetachAudioStreamProcessor(napi_env env, napi_callback_info info);
 napi_value BindNode_AttachAudioMixedProcessor(napi_env env, napi_callback_info info);
 napi_value BindNode_DetachAudioMixedProcessor(napi_env env, napi_callback_info info);
+napi_value BindNode_Clamp(napi_env env, napi_callback_info info);
+napi_value BindNode_Lerp(napi_env env, napi_callback_info info);
+napi_value BindNode_Normalize(napi_env env, napi_callback_info info);
+napi_value BindNode_Remap(napi_env env, napi_callback_info info);
+napi_value BindNode_Wrap(napi_env env, napi_callback_info info);
+napi_value BindNode_FloatEquals(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Zero(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2One(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Add(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2AddValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Subtract(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2SubtractValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Length(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2LengthSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2DotProduct(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Distance(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2DistanceSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Angle(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2LineAngle(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Scale(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Multiply(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Negate(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Divide(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Normalize(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Transform(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Lerp(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Reflect(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Min(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Max(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Rotate(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2MoveTowards(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Invert(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Clamp(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2ClampValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Equals(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector2Refract(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Zero(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3One(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Add(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3AddValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Subtract(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3SubtractValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Scale(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Multiply(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3CrossProduct(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Perpendicular(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Length(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3LengthSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3DotProduct(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Distance(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3DistanceSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Angle(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Negate(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Divide(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Normalize(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Project(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Reject(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3OrthoNormalize(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Transform(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3RotateByQuaternion(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3RotateByAxisAngle(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3MoveTowards(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Lerp(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3CubicHermite(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Reflect(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Min(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Max(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Barycenter(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Unproject(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3ToFloatV(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Invert(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Clamp(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3ClampValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Equals(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector3Refract(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Zero(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4One(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Add(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4AddValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Subtract(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4SubtractValue(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Length(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4LengthSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4DotProduct(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Distance(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4DistanceSqr(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Scale(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Multiply(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Negate(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Divide(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Normalize(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Min(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Max(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Lerp(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4MoveTowards(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Invert(napi_env env, napi_callback_info info);
+napi_value BindNode_Vector4Equals(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixDeterminant(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixTrace(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixTranspose(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixInvert(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixIdentity(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixAdd(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixSubtract(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixMultiply(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixTranslate(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotate(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotateX(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotateY(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotateZ(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotateXYZ(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixRotateZYX(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixScale(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixFrustum(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixPerspective(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixOrtho(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixLookAt(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixToFloatV(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionAdd(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionAddValue(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionSubtract(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionSubtractValue(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionIdentity(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionLength(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionNormalize(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionInvert(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionMultiply(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionScale(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionDivide(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionLerp(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionNlerp(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionSlerp(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionCubicHermiteSpline(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionFromVector3ToVector3(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionFromMatrix(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionToMatrix(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionFromAxisAngle(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionToAxisAngle(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionFromEuler(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionToEuler(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionTransform(napi_env env, napi_callback_info info);
+napi_value BindNode_QuaternionEquals(napi_env env, napi_callback_info info);
+napi_value BindNode_MatrixDecompose(napi_env env, napi_callback_info info);
 
 // Enum definitions
 napi_value Create_ConfigFlags(napi_env env) {
@@ -5894,6 +6045,70 @@ napi_value AutomationEventList_to_js(napi_env env, AutomationEventList data) {
     return jsObj;
 }
 
+float3 float3_from_js(napi_env env, napi_value jsObj) {
+    float3 result;
+    napi_value prop;
+    bool has_property;
+
+    // Get v
+    napi_has_named_property(env, jsObj, "v", &has_property);
+    if (has_property) {
+        napi_get_named_property(env, jsObj, "v", &prop);
+        // TODO: Handle field type float[3]
+    } else {
+        // Set default value
+        // TODO: Set default for float[3]
+        memset(&result.v, 0, sizeof(result.v));
+    }
+
+    return result;
+}
+
+napi_value float3_to_js(napi_env env, float3 data) {
+    napi_value jsObj;
+    napi_create_object(env, &jsObj);
+    napi_value prop;
+
+    // Set v
+    // TODO: Handle field type float[3]
+    napi_get_null(env, &prop);
+    napi_set_named_property(env, jsObj, "v", prop);
+
+    return jsObj;
+}
+
+float16 float16_from_js(napi_env env, napi_value jsObj) {
+    float16 result;
+    napi_value prop;
+    bool has_property;
+
+    // Get v
+    napi_has_named_property(env, jsObj, "v", &has_property);
+    if (has_property) {
+        napi_get_named_property(env, jsObj, "v", &prop);
+        // TODO: Handle field type float[16]
+    } else {
+        // Set default value
+        // TODO: Set default for float[16]
+        memset(&result.v, 0, sizeof(result.v));
+    }
+
+    return result;
+}
+
+napi_value float16_to_js(napi_env env, float16 data) {
+    napi_value jsObj;
+    napi_create_object(env, &jsObj);
+    napi_value prop;
+
+    // Set v
+    // TODO: Handle field type float[16]
+    napi_get_null(env, &prop);
+    napi_set_named_property(env, jsObj, "v", prop);
+
+    return jsObj;
+}
+
 // Stub conversion for undefined struct RenderTexture2D
 RenderTexture2D RenderTexture2D_from_js(napi_env env, napi_value jsObj) {
     // Warning: No struct definition available for RenderTexture2D
@@ -6099,6 +6314,21 @@ AudioCallback AudioCallback_from_js(napi_env env, napi_value jsObj) {
 
 napi_value AudioCallback_to_js(napi_env env, AudioCallback data) {
     // Warning: No struct definition available for AudioCallback
+    napi_value jsObj;
+    napi_create_object(env, &jsObj);
+    return jsObj;
+}
+
+// Stub conversion for undefined struct Quaternion
+Quaternion Quaternion_from_js(napi_env env, napi_value jsObj) {
+    // Warning: No struct definition available for Quaternion
+    Quaternion result;
+    memset(&result, 0, sizeof(result));
+    return result;
+}
+
+napi_value Quaternion_to_js(napi_env env, Quaternion data) {
+    // Warning: No struct definition available for Quaternion
     napi_value jsObj;
     napi_create_object(env, &jsObj);
     return jsObj;
@@ -19203,6 +19433,2939 @@ napi_value BindNode_DetachAudioMixedProcessor(napi_env env, napi_callback_info i
     return jsResult;
 }
 
+napi_value BindNode_Clamp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_value;
+    napi_get_value_double(env, args[0], &temp_value);
+    float value = (float)temp_value;
+
+    double temp_min;
+    napi_get_value_double(env, args[1], &temp_min);
+    float min = (float)temp_min;
+
+    double temp_max;
+    napi_get_value_double(env, args[2], &temp_max);
+    float max = (float)temp_max;
+
+    float result = Clamp(value, min, max);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Lerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_start;
+    napi_get_value_double(env, args[0], &temp_start);
+    float start = (float)temp_start;
+
+    double temp_end;
+    napi_get_value_double(env, args[1], &temp_end);
+    float end = (float)temp_end;
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    float result = Lerp(start, end, amount);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Normalize(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_value;
+    napi_get_value_double(env, args[0], &temp_value);
+    float value = (float)temp_value;
+
+    double temp_start;
+    napi_get_value_double(env, args[1], &temp_start);
+    float start = (float)temp_start;
+
+    double temp_end;
+    napi_get_value_double(env, args[2], &temp_end);
+    float end = (float)temp_end;
+
+    float result = Normalize(value, start, end);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Remap(napi_env env, napi_callback_info info) {
+    size_t argc = 5;
+    napi_value args[5];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 5) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_value;
+    napi_get_value_double(env, args[0], &temp_value);
+    float value = (float)temp_value;
+
+    double temp_inputStart;
+    napi_get_value_double(env, args[1], &temp_inputStart);
+    float inputStart = (float)temp_inputStart;
+
+    double temp_inputEnd;
+    napi_get_value_double(env, args[2], &temp_inputEnd);
+    float inputEnd = (float)temp_inputEnd;
+
+    double temp_outputStart;
+    napi_get_value_double(env, args[3], &temp_outputStart);
+    float outputStart = (float)temp_outputStart;
+
+    double temp_outputEnd;
+    napi_get_value_double(env, args[4], &temp_outputEnd);
+    float outputEnd = (float)temp_outputEnd;
+
+    float result = Remap(value, inputStart, inputEnd, outputStart, outputEnd);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Wrap(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_value;
+    napi_get_value_double(env, args[0], &temp_value);
+    float value = (float)temp_value;
+
+    double temp_min;
+    napi_get_value_double(env, args[1], &temp_min);
+    float min = (float)temp_min;
+
+    double temp_max;
+    napi_get_value_double(env, args[2], &temp_max);
+    float max = (float)temp_max;
+
+    float result = Wrap(value, min, max);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_FloatEquals(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_x;
+    napi_get_value_double(env, args[0], &temp_x);
+    float x = (float)temp_x;
+
+    double temp_y;
+    napi_get_value_double(env, args[1], &temp_y);
+    float y = (float)temp_y;
+
+    int result = FloatEquals(x, y);
+    return int_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Zero(napi_env env, napi_callback_info info) {
+    Vector2 result = Vector2Zero();
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2One(napi_env env, napi_callback_info info) {
+    Vector2 result = Vector2One();
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Add(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Add(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2AddValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    double temp_add;
+    napi_get_value_double(env, args[1], &temp_add);
+    float add = (float)temp_add;
+
+    Vector2 result = Vector2AddValue(v, add);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Subtract(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Subtract(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2SubtractValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    double temp_sub;
+    napi_get_value_double(env, args[1], &temp_sub);
+    float sub = (float)temp_sub;
+
+    Vector2 result = Vector2SubtractValue(v, sub);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Length(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    float result = Vector2Length(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2LengthSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    float result = Vector2LengthSqr(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2DotProduct(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    float result = Vector2DotProduct(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Distance(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    float result = Vector2Distance(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2DistanceSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    float result = Vector2DistanceSqr(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Angle(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    float result = Vector2Angle(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2LineAngle(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 start = Vector2_from_js(env, args[0]);
+
+    Vector2 end = Vector2_from_js(env, args[1]);
+
+    float result = Vector2LineAngle(start, end);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Scale(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    double temp_scale;
+    napi_get_value_double(env, args[1], &temp_scale);
+    float scale = (float)temp_scale;
+
+    Vector2 result = Vector2Scale(v, scale);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Multiply(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Multiply(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Negate(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 result = Vector2Negate(v);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Divide(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Divide(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Normalize(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 result = Vector2Normalize(v);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Transform(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Matrix mat = Matrix_from_js(env, args[1]);
+
+    Vector2 result = Vector2Transform(v, mat);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Lerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Vector2 result = Vector2Lerp(v1, v2, amount);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Reflect(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 normal = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Reflect(v, normal);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Min(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Min(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Max(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v1 = Vector2_from_js(env, args[0]);
+
+    Vector2 v2 = Vector2_from_js(env, args[1]);
+
+    Vector2 result = Vector2Max(v1, v2);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Rotate(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    double temp_angle;
+    napi_get_value_double(env, args[1], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Vector2 result = Vector2Rotate(v, angle);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2MoveTowards(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 target = Vector2_from_js(env, args[1]);
+
+    double temp_maxDistance;
+    napi_get_value_double(env, args[2], &temp_maxDistance);
+    float maxDistance = (float)temp_maxDistance;
+
+    Vector2 result = Vector2MoveTowards(v, target, maxDistance);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Invert(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 result = Vector2Invert(v);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Clamp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 min = Vector2_from_js(env, args[1]);
+
+    Vector2 max = Vector2_from_js(env, args[2]);
+
+    Vector2 result = Vector2Clamp(v, min, max);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2ClampValue(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    double temp_min;
+    napi_get_value_double(env, args[1], &temp_min);
+    float min = (float)temp_min;
+
+    double temp_max;
+    napi_get_value_double(env, args[2], &temp_max);
+    float max = (float)temp_max;
+
+    Vector2 result = Vector2ClampValue(v, min, max);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Equals(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 p = Vector2_from_js(env, args[0]);
+
+    Vector2 q = Vector2_from_js(env, args[1]);
+
+    int result = Vector2Equals(p, q);
+    return int_to_js(env, result);
+}
+
+napi_value BindNode_Vector2Refract(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector2 v = Vector2_from_js(env, args[0]);
+
+    Vector2 n = Vector2_from_js(env, args[1]);
+
+    double temp_r;
+    napi_get_value_double(env, args[2], &temp_r);
+    float r = (float)temp_r;
+
+    Vector2 result = Vector2Refract(v, n, r);
+    return Vector2_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Zero(napi_env env, napi_callback_info info) {
+    Vector3 result = Vector3Zero();
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3One(napi_env env, napi_callback_info info) {
+    Vector3 result = Vector3One();
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Add(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Add(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3AddValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    double temp_add;
+    napi_get_value_double(env, args[1], &temp_add);
+    float add = (float)temp_add;
+
+    Vector3 result = Vector3AddValue(v, add);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Subtract(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Subtract(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3SubtractValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    double temp_sub;
+    napi_get_value_double(env, args[1], &temp_sub);
+    float sub = (float)temp_sub;
+
+    Vector3 result = Vector3SubtractValue(v, sub);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Scale(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    double temp_scalar;
+    napi_get_value_double(env, args[1], &temp_scalar);
+    float scalar = (float)temp_scalar;
+
+    Vector3 result = Vector3Scale(v, scalar);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Multiply(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Multiply(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3CrossProduct(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3CrossProduct(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Perpendicular(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 result = Vector3Perpendicular(v);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Length(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    // Warning: No conversion available for const Vector3
+    const Vector3 v;
+    memset(&v, 0, sizeof(v));
+
+    float result = Vector3Length(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3LengthSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    // Warning: No conversion available for const Vector3
+    const Vector3 v;
+    memset(&v, 0, sizeof(v));
+
+    float result = Vector3LengthSqr(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3DotProduct(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    float result = Vector3DotProduct(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Distance(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    float result = Vector3Distance(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3DistanceSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    float result = Vector3DistanceSqr(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Angle(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    float result = Vector3Angle(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Negate(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 result = Vector3Negate(v);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Divide(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Divide(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Normalize(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 result = Vector3Normalize(v);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Project(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Project(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Reject(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Reject(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3OrthoNormalize(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1_value = Vector3_from_js(env, args[0]);
+    Vector3 * v1 = &v1_value;
+
+    Vector3 v2_value = Vector3_from_js(env, args[1]);
+    Vector3 * v2 = &v2_value;
+
+    Vector3OrthoNormalize(v1, v2);
+    napi_value jsResult;
+    napi_get_undefined(env, &jsResult);
+    return jsResult;
+}
+
+napi_value BindNode_Vector3Transform(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Matrix mat = Matrix_from_js(env, args[1]);
+
+    Vector3 result = Vector3Transform(v, mat);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3RotateByQuaternion(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Quaternion q = Quaternion_from_js(env, args[1]);
+
+    Vector3 result = Vector3RotateByQuaternion(v, q);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3RotateByAxisAngle(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 axis = Vector3_from_js(env, args[1]);
+
+    double temp_angle;
+    napi_get_value_double(env, args[2], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Vector3 result = Vector3RotateByAxisAngle(v, axis, angle);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3MoveTowards(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 target = Vector3_from_js(env, args[1]);
+
+    double temp_maxDistance;
+    napi_get_value_double(env, args[2], &temp_maxDistance);
+    float maxDistance = (float)temp_maxDistance;
+
+    Vector3 result = Vector3MoveTowards(v, target, maxDistance);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Lerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Vector3 result = Vector3Lerp(v1, v2, amount);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3CubicHermite(napi_env env, napi_callback_info info) {
+    size_t argc = 5;
+    napi_value args[5];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 5) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 tangent1 = Vector3_from_js(env, args[1]);
+
+    Vector3 v2 = Vector3_from_js(env, args[2]);
+
+    Vector3 tangent2 = Vector3_from_js(env, args[3]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[4], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Vector3 result = Vector3CubicHermite(v1, tangent1, v2, tangent2, amount);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Reflect(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 normal = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Reflect(v, normal);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Min(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Min(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Max(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v1 = Vector3_from_js(env, args[0]);
+
+    Vector3 v2 = Vector3_from_js(env, args[1]);
+
+    Vector3 result = Vector3Max(v1, v2);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Barycenter(napi_env env, napi_callback_info info) {
+    size_t argc = 4;
+    napi_value args[4];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 4) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 p = Vector3_from_js(env, args[0]);
+
+    Vector3 a = Vector3_from_js(env, args[1]);
+
+    Vector3 b = Vector3_from_js(env, args[2]);
+
+    Vector3 c = Vector3_from_js(env, args[3]);
+
+    Vector3 result = Vector3Barycenter(p, a, b, c);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Unproject(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 source = Vector3_from_js(env, args[0]);
+
+    Matrix projection = Matrix_from_js(env, args[1]);
+
+    Matrix view = Matrix_from_js(env, args[2]);
+
+    Vector3 result = Vector3Unproject(source, projection, view);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3ToFloatV(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    float3 result = Vector3ToFloatV(v);
+    return float3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Invert(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 result = Vector3Invert(v);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Clamp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 min = Vector3_from_js(env, args[1]);
+
+    Vector3 max = Vector3_from_js(env, args[2]);
+
+    Vector3 result = Vector3Clamp(v, min, max);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3ClampValue(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    double temp_min;
+    napi_get_value_double(env, args[1], &temp_min);
+    float min = (float)temp_min;
+
+    double temp_max;
+    napi_get_value_double(env, args[2], &temp_max);
+    float max = (float)temp_max;
+
+    Vector3 result = Vector3ClampValue(v, min, max);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Equals(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 p = Vector3_from_js(env, args[0]);
+
+    Vector3 q = Vector3_from_js(env, args[1]);
+
+    int result = Vector3Equals(p, q);
+    return int_to_js(env, result);
+}
+
+napi_value BindNode_Vector3Refract(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 v = Vector3_from_js(env, args[0]);
+
+    Vector3 n = Vector3_from_js(env, args[1]);
+
+    double temp_r;
+    napi_get_value_double(env, args[2], &temp_r);
+    float r = (float)temp_r;
+
+    Vector3 result = Vector3Refract(v, n, r);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Zero(napi_env env, napi_callback_info info) {
+    Vector4 result = Vector4Zero();
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4One(napi_env env, napi_callback_info info) {
+    Vector4 result = Vector4One();
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Add(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Add(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4AddValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    double temp_add;
+    napi_get_value_double(env, args[1], &temp_add);
+    float add = (float)temp_add;
+
+    Vector4 result = Vector4AddValue(v, add);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Subtract(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Subtract(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4SubtractValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    double temp_add;
+    napi_get_value_double(env, args[1], &temp_add);
+    float add = (float)temp_add;
+
+    Vector4 result = Vector4SubtractValue(v, add);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Length(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    float result = Vector4Length(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector4LengthSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    float result = Vector4LengthSqr(v);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector4DotProduct(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    float result = Vector4DotProduct(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Distance(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    float result = Vector4Distance(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector4DistanceSqr(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    float result = Vector4DistanceSqr(v1, v2);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Scale(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    double temp_scale;
+    napi_get_value_double(env, args[1], &temp_scale);
+    float scale = (float)temp_scale;
+
+    Vector4 result = Vector4Scale(v, scale);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Multiply(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Multiply(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Negate(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    Vector4 result = Vector4Negate(v);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Divide(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Divide(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Normalize(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    Vector4 result = Vector4Normalize(v);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Min(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Min(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Max(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    Vector4 result = Vector4Max(v1, v2);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Lerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v1 = Vector4_from_js(env, args[0]);
+
+    Vector4 v2 = Vector4_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Vector4 result = Vector4Lerp(v1, v2, amount);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4MoveTowards(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    Vector4 target = Vector4_from_js(env, args[1]);
+
+    double temp_maxDistance;
+    napi_get_value_double(env, args[2], &temp_maxDistance);
+    float maxDistance = (float)temp_maxDistance;
+
+    Vector4 result = Vector4MoveTowards(v, target, maxDistance);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Invert(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 v = Vector4_from_js(env, args[0]);
+
+    Vector4 result = Vector4Invert(v);
+    return Vector4_to_js(env, result);
+}
+
+napi_value BindNode_Vector4Equals(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector4 p = Vector4_from_js(env, args[0]);
+
+    Vector4 q = Vector4_from_js(env, args[1]);
+
+    int result = Vector4Equals(p, q);
+    return int_to_js(env, result);
+}
+
+napi_value BindNode_MatrixDeterminant(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    float result = MatrixDeterminant(mat);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_MatrixTrace(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    float result = MatrixTrace(mat);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_MatrixTranspose(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    Matrix result = MatrixTranspose(mat);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixInvert(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    Matrix result = MatrixInvert(mat);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixIdentity(napi_env env, napi_callback_info info) {
+    Matrix result = MatrixIdentity();
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixAdd(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix left = Matrix_from_js(env, args[0]);
+
+    Matrix right = Matrix_from_js(env, args[1]);
+
+    Matrix result = MatrixAdd(left, right);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixSubtract(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix left = Matrix_from_js(env, args[0]);
+
+    Matrix right = Matrix_from_js(env, args[1]);
+
+    Matrix result = MatrixSubtract(left, right);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixMultiply(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix left = Matrix_from_js(env, args[0]);
+
+    Matrix right = Matrix_from_js(env, args[1]);
+
+    Matrix result = MatrixMultiply(left, right);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixTranslate(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_x;
+    napi_get_value_double(env, args[0], &temp_x);
+    float x = (float)temp_x;
+
+    double temp_y;
+    napi_get_value_double(env, args[1], &temp_y);
+    float y = (float)temp_y;
+
+    double temp_z;
+    napi_get_value_double(env, args[2], &temp_z);
+    float z = (float)temp_z;
+
+    Matrix result = MatrixTranslate(x, y, z);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotate(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 axis = Vector3_from_js(env, args[0]);
+
+    double temp_angle;
+    napi_get_value_double(env, args[1], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Matrix result = MatrixRotate(axis, angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotateX(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_angle;
+    napi_get_value_double(env, args[0], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Matrix result = MatrixRotateX(angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotateY(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_angle;
+    napi_get_value_double(env, args[0], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Matrix result = MatrixRotateY(angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotateZ(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_angle;
+    napi_get_value_double(env, args[0], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Matrix result = MatrixRotateZ(angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotateXYZ(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 angle = Vector3_from_js(env, args[0]);
+
+    Matrix result = MatrixRotateXYZ(angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixRotateZYX(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 angle = Vector3_from_js(env, args[0]);
+
+    Matrix result = MatrixRotateZYX(angle);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixScale(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_x;
+    napi_get_value_double(env, args[0], &temp_x);
+    float x = (float)temp_x;
+
+    double temp_y;
+    napi_get_value_double(env, args[1], &temp_y);
+    float y = (float)temp_y;
+
+    double temp_z;
+    napi_get_value_double(env, args[2], &temp_z);
+    float z = (float)temp_z;
+
+    Matrix result = MatrixScale(x, y, z);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixFrustum(napi_env env, napi_callback_info info) {
+    size_t argc = 6;
+    napi_value args[6];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 6) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double left;
+    napi_get_value_double(env, args[0], &left);
+
+    double right;
+    napi_get_value_double(env, args[1], &right);
+
+    double bottom;
+    napi_get_value_double(env, args[2], &bottom);
+
+    double top;
+    napi_get_value_double(env, args[3], &top);
+
+    double nearPlane;
+    napi_get_value_double(env, args[4], &nearPlane);
+
+    double farPlane;
+    napi_get_value_double(env, args[5], &farPlane);
+
+    Matrix result = MatrixFrustum(left, right, bottom, top, nearPlane, farPlane);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixPerspective(napi_env env, napi_callback_info info) {
+    size_t argc = 4;
+    napi_value args[4];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 4) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double fovY;
+    napi_get_value_double(env, args[0], &fovY);
+
+    double aspect;
+    napi_get_value_double(env, args[1], &aspect);
+
+    double nearPlane;
+    napi_get_value_double(env, args[2], &nearPlane);
+
+    double farPlane;
+    napi_get_value_double(env, args[3], &farPlane);
+
+    Matrix result = MatrixPerspective(fovY, aspect, nearPlane, farPlane);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixOrtho(napi_env env, napi_callback_info info) {
+    size_t argc = 6;
+    napi_value args[6];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 6) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double left;
+    napi_get_value_double(env, args[0], &left);
+
+    double right;
+    napi_get_value_double(env, args[1], &right);
+
+    double bottom;
+    napi_get_value_double(env, args[2], &bottom);
+
+    double top;
+    napi_get_value_double(env, args[3], &top);
+
+    double nearPlane;
+    napi_get_value_double(env, args[4], &nearPlane);
+
+    double farPlane;
+    napi_get_value_double(env, args[5], &farPlane);
+
+    Matrix result = MatrixOrtho(left, right, bottom, top, nearPlane, farPlane);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixLookAt(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 eye = Vector3_from_js(env, args[0]);
+
+    Vector3 target = Vector3_from_js(env, args[1]);
+
+    Vector3 up = Vector3_from_js(env, args[2]);
+
+    Matrix result = MatrixLookAt(eye, target, up);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_MatrixToFloatV(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    float16 result = MatrixToFloatV(mat);
+    return float16_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionAdd(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    Quaternion result = QuaternionAdd(q1, q2);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionAddValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    double temp_add;
+    napi_get_value_double(env, args[1], &temp_add);
+    float add = (float)temp_add;
+
+    Quaternion result = QuaternionAddValue(q, add);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionSubtract(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    Quaternion result = QuaternionSubtract(q1, q2);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionSubtractValue(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    double temp_sub;
+    napi_get_value_double(env, args[1], &temp_sub);
+    float sub = (float)temp_sub;
+
+    Quaternion result = QuaternionSubtractValue(q, sub);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionIdentity(napi_env env, napi_callback_info info) {
+    Quaternion result = QuaternionIdentity();
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionLength(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    float result = QuaternionLength(q);
+    return float_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionNormalize(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Quaternion result = QuaternionNormalize(q);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionInvert(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Quaternion result = QuaternionInvert(q);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionMultiply(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    Quaternion result = QuaternionMultiply(q1, q2);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionScale(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    double temp_mul;
+    napi_get_value_double(env, args[1], &temp_mul);
+    float mul = (float)temp_mul;
+
+    Quaternion result = QuaternionScale(q, mul);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionDivide(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    Quaternion result = QuaternionDivide(q1, q2);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionLerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Quaternion result = QuaternionLerp(q1, q2, amount);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionNlerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Quaternion result = QuaternionNlerp(q1, q2, amount);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionSlerp(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[1]);
+
+    double temp_amount;
+    napi_get_value_double(env, args[2], &temp_amount);
+    float amount = (float)temp_amount;
+
+    Quaternion result = QuaternionSlerp(q1, q2, amount);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionCubicHermiteSpline(napi_env env, napi_callback_info info) {
+    size_t argc = 5;
+    napi_value args[5];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 5) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q1 = Quaternion_from_js(env, args[0]);
+
+    Quaternion outTangent1 = Quaternion_from_js(env, args[1]);
+
+    Quaternion q2 = Quaternion_from_js(env, args[2]);
+
+    Quaternion inTangent2 = Quaternion_from_js(env, args[3]);
+
+    double temp_t;
+    napi_get_value_double(env, args[4], &temp_t);
+    float t = (float)temp_t;
+
+    Quaternion result = QuaternionCubicHermiteSpline(q1, outTangent1, q2, inTangent2, t);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionFromVector3ToVector3(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 from = Vector3_from_js(env, args[0]);
+
+    Vector3 to = Vector3_from_js(env, args[1]);
+
+    Quaternion result = QuaternionFromVector3ToVector3(from, to);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionFromMatrix(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    Quaternion result = QuaternionFromMatrix(mat);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionToMatrix(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Matrix result = QuaternionToMatrix(q);
+    return Matrix_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionFromAxisAngle(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Vector3 axis = Vector3_from_js(env, args[0]);
+
+    double temp_angle;
+    napi_get_value_double(env, args[1], &temp_angle);
+    float angle = (float)temp_angle;
+
+    Quaternion result = QuaternionFromAxisAngle(axis, angle);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionToAxisAngle(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Vector3 outAxis_value = Vector3_from_js(env, args[1]);
+    Vector3 * outAxis = &outAxis_value;
+
+    float outAngle_value = float_from_js(env, args[2]);
+    float * outAngle = &outAngle_value;
+
+    QuaternionToAxisAngle(q, outAxis, outAngle);
+    napi_value jsResult;
+    napi_get_undefined(env, &jsResult);
+    return jsResult;
+}
+
+napi_value BindNode_QuaternionFromEuler(napi_env env, napi_callback_info info) {
+    size_t argc = 3;
+    napi_value args[3];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 3) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    double temp_pitch;
+    napi_get_value_double(env, args[0], &temp_pitch);
+    float pitch = (float)temp_pitch;
+
+    double temp_yaw;
+    napi_get_value_double(env, args[1], &temp_yaw);
+    float yaw = (float)temp_yaw;
+
+    double temp_roll;
+    napi_get_value_double(env, args[2], &temp_roll);
+    float roll = (float)temp_roll;
+
+    Quaternion result = QuaternionFromEuler(pitch, yaw, roll);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionToEuler(napi_env env, napi_callback_info info) {
+    size_t argc = 1;
+    napi_value args[1];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 1) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Vector3 result = QuaternionToEuler(q);
+    return Vector3_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionTransform(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion q = Quaternion_from_js(env, args[0]);
+
+    Matrix mat = Matrix_from_js(env, args[1]);
+
+    Quaternion result = QuaternionTransform(q, mat);
+    return Quaternion_to_js(env, result);
+}
+
+napi_value BindNode_QuaternionEquals(napi_env env, napi_callback_info info) {
+    size_t argc = 2;
+    napi_value args[2];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 2) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Quaternion p = Quaternion_from_js(env, args[0]);
+
+    Quaternion q = Quaternion_from_js(env, args[1]);
+
+    int result = QuaternionEquals(p, q);
+    return int_to_js(env, result);
+}
+
+napi_value BindNode_MatrixDecompose(napi_env env, napi_callback_info info) {
+    size_t argc = 4;
+    napi_value args[4];
+    napi_get_cb_info(env, info, &argc, args, NULL, NULL);
+
+    if (argc < 4) {
+        napi_throw_error(env, NULL, "Wrong number of arguments");
+        napi_value undefined;
+        napi_get_undefined(env, &undefined);
+        return undefined;
+    }
+
+    Matrix mat = Matrix_from_js(env, args[0]);
+
+    Vector3 translation_value = Vector3_from_js(env, args[1]);
+    Vector3 * translation = &translation_value;
+
+    Quaternion rotation_value = Quaternion_from_js(env, args[2]);
+    Quaternion * rotation = &rotation_value;
+
+    Vector3 scale_value = Vector3_from_js(env, args[3]);
+    Vector3 * scale = &scale_value;
+
+    MatrixDecompose(mat, translation, rotation, scale);
+    napi_value jsResult;
+    napi_get_undefined(env, &jsResult);
+    return jsResult;
+}
+
 
 // Initialize module
 napi_value Init(napi_env env, napi_value exports) {
@@ -21614,6 +24777,578 @@ napi_value Init(napi_env env, napi_value exports) {
     napi_value DetachAudioMixedProcessor_fn;
     napi_create_function(env, NULL, 0, BindNode_DetachAudioMixedProcessor, NULL, &DetachAudioMixedProcessor_fn);
     napi_set_named_property(env, exports, "DetachAudioMixedProcessor", DetachAudioMixedProcessor_fn);
+
+    napi_value Clamp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Clamp, NULL, &Clamp_fn);
+    napi_set_named_property(env, exports, "Clamp", Clamp_fn);
+
+    napi_value Lerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Lerp, NULL, &Lerp_fn);
+    napi_set_named_property(env, exports, "Lerp", Lerp_fn);
+
+    napi_value Normalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_Normalize, NULL, &Normalize_fn);
+    napi_set_named_property(env, exports, "Normalize", Normalize_fn);
+
+    napi_value Remap_fn;
+    napi_create_function(env, NULL, 0, BindNode_Remap, NULL, &Remap_fn);
+    napi_set_named_property(env, exports, "Remap", Remap_fn);
+
+    napi_value Wrap_fn;
+    napi_create_function(env, NULL, 0, BindNode_Wrap, NULL, &Wrap_fn);
+    napi_set_named_property(env, exports, "Wrap", Wrap_fn);
+
+    napi_value FloatEquals_fn;
+    napi_create_function(env, NULL, 0, BindNode_FloatEquals, NULL, &FloatEquals_fn);
+    napi_set_named_property(env, exports, "FloatEquals", FloatEquals_fn);
+
+    napi_value Vector2Zero_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Zero, NULL, &Vector2Zero_fn);
+    napi_set_named_property(env, exports, "Vector2Zero", Vector2Zero_fn);
+
+    napi_value Vector2One_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2One, NULL, &Vector2One_fn);
+    napi_set_named_property(env, exports, "Vector2One", Vector2One_fn);
+
+    napi_value Vector2Add_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Add, NULL, &Vector2Add_fn);
+    napi_set_named_property(env, exports, "Vector2Add", Vector2Add_fn);
+
+    napi_value Vector2AddValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2AddValue, NULL, &Vector2AddValue_fn);
+    napi_set_named_property(env, exports, "Vector2AddValue", Vector2AddValue_fn);
+
+    napi_value Vector2Subtract_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Subtract, NULL, &Vector2Subtract_fn);
+    napi_set_named_property(env, exports, "Vector2Subtract", Vector2Subtract_fn);
+
+    napi_value Vector2SubtractValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2SubtractValue, NULL, &Vector2SubtractValue_fn);
+    napi_set_named_property(env, exports, "Vector2SubtractValue", Vector2SubtractValue_fn);
+
+    napi_value Vector2Length_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Length, NULL, &Vector2Length_fn);
+    napi_set_named_property(env, exports, "Vector2Length", Vector2Length_fn);
+
+    napi_value Vector2LengthSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2LengthSqr, NULL, &Vector2LengthSqr_fn);
+    napi_set_named_property(env, exports, "Vector2LengthSqr", Vector2LengthSqr_fn);
+
+    napi_value Vector2DotProduct_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2DotProduct, NULL, &Vector2DotProduct_fn);
+    napi_set_named_property(env, exports, "Vector2DotProduct", Vector2DotProduct_fn);
+
+    napi_value Vector2Distance_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Distance, NULL, &Vector2Distance_fn);
+    napi_set_named_property(env, exports, "Vector2Distance", Vector2Distance_fn);
+
+    napi_value Vector2DistanceSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2DistanceSqr, NULL, &Vector2DistanceSqr_fn);
+    napi_set_named_property(env, exports, "Vector2DistanceSqr", Vector2DistanceSqr_fn);
+
+    napi_value Vector2Angle_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Angle, NULL, &Vector2Angle_fn);
+    napi_set_named_property(env, exports, "Vector2Angle", Vector2Angle_fn);
+
+    napi_value Vector2LineAngle_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2LineAngle, NULL, &Vector2LineAngle_fn);
+    napi_set_named_property(env, exports, "Vector2LineAngle", Vector2LineAngle_fn);
+
+    napi_value Vector2Scale_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Scale, NULL, &Vector2Scale_fn);
+    napi_set_named_property(env, exports, "Vector2Scale", Vector2Scale_fn);
+
+    napi_value Vector2Multiply_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Multiply, NULL, &Vector2Multiply_fn);
+    napi_set_named_property(env, exports, "Vector2Multiply", Vector2Multiply_fn);
+
+    napi_value Vector2Negate_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Negate, NULL, &Vector2Negate_fn);
+    napi_set_named_property(env, exports, "Vector2Negate", Vector2Negate_fn);
+
+    napi_value Vector2Divide_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Divide, NULL, &Vector2Divide_fn);
+    napi_set_named_property(env, exports, "Vector2Divide", Vector2Divide_fn);
+
+    napi_value Vector2Normalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Normalize, NULL, &Vector2Normalize_fn);
+    napi_set_named_property(env, exports, "Vector2Normalize", Vector2Normalize_fn);
+
+    napi_value Vector2Transform_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Transform, NULL, &Vector2Transform_fn);
+    napi_set_named_property(env, exports, "Vector2Transform", Vector2Transform_fn);
+
+    napi_value Vector2Lerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Lerp, NULL, &Vector2Lerp_fn);
+    napi_set_named_property(env, exports, "Vector2Lerp", Vector2Lerp_fn);
+
+    napi_value Vector2Reflect_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Reflect, NULL, &Vector2Reflect_fn);
+    napi_set_named_property(env, exports, "Vector2Reflect", Vector2Reflect_fn);
+
+    napi_value Vector2Min_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Min, NULL, &Vector2Min_fn);
+    napi_set_named_property(env, exports, "Vector2Min", Vector2Min_fn);
+
+    napi_value Vector2Max_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Max, NULL, &Vector2Max_fn);
+    napi_set_named_property(env, exports, "Vector2Max", Vector2Max_fn);
+
+    napi_value Vector2Rotate_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Rotate, NULL, &Vector2Rotate_fn);
+    napi_set_named_property(env, exports, "Vector2Rotate", Vector2Rotate_fn);
+
+    napi_value Vector2MoveTowards_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2MoveTowards, NULL, &Vector2MoveTowards_fn);
+    napi_set_named_property(env, exports, "Vector2MoveTowards", Vector2MoveTowards_fn);
+
+    napi_value Vector2Invert_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Invert, NULL, &Vector2Invert_fn);
+    napi_set_named_property(env, exports, "Vector2Invert", Vector2Invert_fn);
+
+    napi_value Vector2Clamp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Clamp, NULL, &Vector2Clamp_fn);
+    napi_set_named_property(env, exports, "Vector2Clamp", Vector2Clamp_fn);
+
+    napi_value Vector2ClampValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2ClampValue, NULL, &Vector2ClampValue_fn);
+    napi_set_named_property(env, exports, "Vector2ClampValue", Vector2ClampValue_fn);
+
+    napi_value Vector2Equals_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Equals, NULL, &Vector2Equals_fn);
+    napi_set_named_property(env, exports, "Vector2Equals", Vector2Equals_fn);
+
+    napi_value Vector2Refract_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector2Refract, NULL, &Vector2Refract_fn);
+    napi_set_named_property(env, exports, "Vector2Refract", Vector2Refract_fn);
+
+    napi_value Vector3Zero_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Zero, NULL, &Vector3Zero_fn);
+    napi_set_named_property(env, exports, "Vector3Zero", Vector3Zero_fn);
+
+    napi_value Vector3One_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3One, NULL, &Vector3One_fn);
+    napi_set_named_property(env, exports, "Vector3One", Vector3One_fn);
+
+    napi_value Vector3Add_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Add, NULL, &Vector3Add_fn);
+    napi_set_named_property(env, exports, "Vector3Add", Vector3Add_fn);
+
+    napi_value Vector3AddValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3AddValue, NULL, &Vector3AddValue_fn);
+    napi_set_named_property(env, exports, "Vector3AddValue", Vector3AddValue_fn);
+
+    napi_value Vector3Subtract_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Subtract, NULL, &Vector3Subtract_fn);
+    napi_set_named_property(env, exports, "Vector3Subtract", Vector3Subtract_fn);
+
+    napi_value Vector3SubtractValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3SubtractValue, NULL, &Vector3SubtractValue_fn);
+    napi_set_named_property(env, exports, "Vector3SubtractValue", Vector3SubtractValue_fn);
+
+    napi_value Vector3Scale_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Scale, NULL, &Vector3Scale_fn);
+    napi_set_named_property(env, exports, "Vector3Scale", Vector3Scale_fn);
+
+    napi_value Vector3Multiply_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Multiply, NULL, &Vector3Multiply_fn);
+    napi_set_named_property(env, exports, "Vector3Multiply", Vector3Multiply_fn);
+
+    napi_value Vector3CrossProduct_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3CrossProduct, NULL, &Vector3CrossProduct_fn);
+    napi_set_named_property(env, exports, "Vector3CrossProduct", Vector3CrossProduct_fn);
+
+    napi_value Vector3Perpendicular_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Perpendicular, NULL, &Vector3Perpendicular_fn);
+    napi_set_named_property(env, exports, "Vector3Perpendicular", Vector3Perpendicular_fn);
+
+    napi_value Vector3Length_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Length, NULL, &Vector3Length_fn);
+    napi_set_named_property(env, exports, "Vector3Length", Vector3Length_fn);
+
+    napi_value Vector3LengthSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3LengthSqr, NULL, &Vector3LengthSqr_fn);
+    napi_set_named_property(env, exports, "Vector3LengthSqr", Vector3LengthSqr_fn);
+
+    napi_value Vector3DotProduct_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3DotProduct, NULL, &Vector3DotProduct_fn);
+    napi_set_named_property(env, exports, "Vector3DotProduct", Vector3DotProduct_fn);
+
+    napi_value Vector3Distance_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Distance, NULL, &Vector3Distance_fn);
+    napi_set_named_property(env, exports, "Vector3Distance", Vector3Distance_fn);
+
+    napi_value Vector3DistanceSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3DistanceSqr, NULL, &Vector3DistanceSqr_fn);
+    napi_set_named_property(env, exports, "Vector3DistanceSqr", Vector3DistanceSqr_fn);
+
+    napi_value Vector3Angle_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Angle, NULL, &Vector3Angle_fn);
+    napi_set_named_property(env, exports, "Vector3Angle", Vector3Angle_fn);
+
+    napi_value Vector3Negate_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Negate, NULL, &Vector3Negate_fn);
+    napi_set_named_property(env, exports, "Vector3Negate", Vector3Negate_fn);
+
+    napi_value Vector3Divide_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Divide, NULL, &Vector3Divide_fn);
+    napi_set_named_property(env, exports, "Vector3Divide", Vector3Divide_fn);
+
+    napi_value Vector3Normalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Normalize, NULL, &Vector3Normalize_fn);
+    napi_set_named_property(env, exports, "Vector3Normalize", Vector3Normalize_fn);
+
+    napi_value Vector3Project_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Project, NULL, &Vector3Project_fn);
+    napi_set_named_property(env, exports, "Vector3Project", Vector3Project_fn);
+
+    napi_value Vector3Reject_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Reject, NULL, &Vector3Reject_fn);
+    napi_set_named_property(env, exports, "Vector3Reject", Vector3Reject_fn);
+
+    napi_value Vector3OrthoNormalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3OrthoNormalize, NULL, &Vector3OrthoNormalize_fn);
+    napi_set_named_property(env, exports, "Vector3OrthoNormalize", Vector3OrthoNormalize_fn);
+
+    napi_value Vector3Transform_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Transform, NULL, &Vector3Transform_fn);
+    napi_set_named_property(env, exports, "Vector3Transform", Vector3Transform_fn);
+
+    napi_value Vector3RotateByQuaternion_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3RotateByQuaternion, NULL, &Vector3RotateByQuaternion_fn);
+    napi_set_named_property(env, exports, "Vector3RotateByQuaternion", Vector3RotateByQuaternion_fn);
+
+    napi_value Vector3RotateByAxisAngle_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3RotateByAxisAngle, NULL, &Vector3RotateByAxisAngle_fn);
+    napi_set_named_property(env, exports, "Vector3RotateByAxisAngle", Vector3RotateByAxisAngle_fn);
+
+    napi_value Vector3MoveTowards_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3MoveTowards, NULL, &Vector3MoveTowards_fn);
+    napi_set_named_property(env, exports, "Vector3MoveTowards", Vector3MoveTowards_fn);
+
+    napi_value Vector3Lerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Lerp, NULL, &Vector3Lerp_fn);
+    napi_set_named_property(env, exports, "Vector3Lerp", Vector3Lerp_fn);
+
+    napi_value Vector3CubicHermite_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3CubicHermite, NULL, &Vector3CubicHermite_fn);
+    napi_set_named_property(env, exports, "Vector3CubicHermite", Vector3CubicHermite_fn);
+
+    napi_value Vector3Reflect_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Reflect, NULL, &Vector3Reflect_fn);
+    napi_set_named_property(env, exports, "Vector3Reflect", Vector3Reflect_fn);
+
+    napi_value Vector3Min_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Min, NULL, &Vector3Min_fn);
+    napi_set_named_property(env, exports, "Vector3Min", Vector3Min_fn);
+
+    napi_value Vector3Max_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Max, NULL, &Vector3Max_fn);
+    napi_set_named_property(env, exports, "Vector3Max", Vector3Max_fn);
+
+    napi_value Vector3Barycenter_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Barycenter, NULL, &Vector3Barycenter_fn);
+    napi_set_named_property(env, exports, "Vector3Barycenter", Vector3Barycenter_fn);
+
+    napi_value Vector3Unproject_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Unproject, NULL, &Vector3Unproject_fn);
+    napi_set_named_property(env, exports, "Vector3Unproject", Vector3Unproject_fn);
+
+    napi_value Vector3ToFloatV_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3ToFloatV, NULL, &Vector3ToFloatV_fn);
+    napi_set_named_property(env, exports, "Vector3ToFloatV", Vector3ToFloatV_fn);
+
+    napi_value Vector3Invert_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Invert, NULL, &Vector3Invert_fn);
+    napi_set_named_property(env, exports, "Vector3Invert", Vector3Invert_fn);
+
+    napi_value Vector3Clamp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Clamp, NULL, &Vector3Clamp_fn);
+    napi_set_named_property(env, exports, "Vector3Clamp", Vector3Clamp_fn);
+
+    napi_value Vector3ClampValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3ClampValue, NULL, &Vector3ClampValue_fn);
+    napi_set_named_property(env, exports, "Vector3ClampValue", Vector3ClampValue_fn);
+
+    napi_value Vector3Equals_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Equals, NULL, &Vector3Equals_fn);
+    napi_set_named_property(env, exports, "Vector3Equals", Vector3Equals_fn);
+
+    napi_value Vector3Refract_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector3Refract, NULL, &Vector3Refract_fn);
+    napi_set_named_property(env, exports, "Vector3Refract", Vector3Refract_fn);
+
+    napi_value Vector4Zero_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Zero, NULL, &Vector4Zero_fn);
+    napi_set_named_property(env, exports, "Vector4Zero", Vector4Zero_fn);
+
+    napi_value Vector4One_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4One, NULL, &Vector4One_fn);
+    napi_set_named_property(env, exports, "Vector4One", Vector4One_fn);
+
+    napi_value Vector4Add_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Add, NULL, &Vector4Add_fn);
+    napi_set_named_property(env, exports, "Vector4Add", Vector4Add_fn);
+
+    napi_value Vector4AddValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4AddValue, NULL, &Vector4AddValue_fn);
+    napi_set_named_property(env, exports, "Vector4AddValue", Vector4AddValue_fn);
+
+    napi_value Vector4Subtract_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Subtract, NULL, &Vector4Subtract_fn);
+    napi_set_named_property(env, exports, "Vector4Subtract", Vector4Subtract_fn);
+
+    napi_value Vector4SubtractValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4SubtractValue, NULL, &Vector4SubtractValue_fn);
+    napi_set_named_property(env, exports, "Vector4SubtractValue", Vector4SubtractValue_fn);
+
+    napi_value Vector4Length_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Length, NULL, &Vector4Length_fn);
+    napi_set_named_property(env, exports, "Vector4Length", Vector4Length_fn);
+
+    napi_value Vector4LengthSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4LengthSqr, NULL, &Vector4LengthSqr_fn);
+    napi_set_named_property(env, exports, "Vector4LengthSqr", Vector4LengthSqr_fn);
+
+    napi_value Vector4DotProduct_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4DotProduct, NULL, &Vector4DotProduct_fn);
+    napi_set_named_property(env, exports, "Vector4DotProduct", Vector4DotProduct_fn);
+
+    napi_value Vector4Distance_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Distance, NULL, &Vector4Distance_fn);
+    napi_set_named_property(env, exports, "Vector4Distance", Vector4Distance_fn);
+
+    napi_value Vector4DistanceSqr_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4DistanceSqr, NULL, &Vector4DistanceSqr_fn);
+    napi_set_named_property(env, exports, "Vector4DistanceSqr", Vector4DistanceSqr_fn);
+
+    napi_value Vector4Scale_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Scale, NULL, &Vector4Scale_fn);
+    napi_set_named_property(env, exports, "Vector4Scale", Vector4Scale_fn);
+
+    napi_value Vector4Multiply_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Multiply, NULL, &Vector4Multiply_fn);
+    napi_set_named_property(env, exports, "Vector4Multiply", Vector4Multiply_fn);
+
+    napi_value Vector4Negate_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Negate, NULL, &Vector4Negate_fn);
+    napi_set_named_property(env, exports, "Vector4Negate", Vector4Negate_fn);
+
+    napi_value Vector4Divide_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Divide, NULL, &Vector4Divide_fn);
+    napi_set_named_property(env, exports, "Vector4Divide", Vector4Divide_fn);
+
+    napi_value Vector4Normalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Normalize, NULL, &Vector4Normalize_fn);
+    napi_set_named_property(env, exports, "Vector4Normalize", Vector4Normalize_fn);
+
+    napi_value Vector4Min_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Min, NULL, &Vector4Min_fn);
+    napi_set_named_property(env, exports, "Vector4Min", Vector4Min_fn);
+
+    napi_value Vector4Max_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Max, NULL, &Vector4Max_fn);
+    napi_set_named_property(env, exports, "Vector4Max", Vector4Max_fn);
+
+    napi_value Vector4Lerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Lerp, NULL, &Vector4Lerp_fn);
+    napi_set_named_property(env, exports, "Vector4Lerp", Vector4Lerp_fn);
+
+    napi_value Vector4MoveTowards_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4MoveTowards, NULL, &Vector4MoveTowards_fn);
+    napi_set_named_property(env, exports, "Vector4MoveTowards", Vector4MoveTowards_fn);
+
+    napi_value Vector4Invert_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Invert, NULL, &Vector4Invert_fn);
+    napi_set_named_property(env, exports, "Vector4Invert", Vector4Invert_fn);
+
+    napi_value Vector4Equals_fn;
+    napi_create_function(env, NULL, 0, BindNode_Vector4Equals, NULL, &Vector4Equals_fn);
+    napi_set_named_property(env, exports, "Vector4Equals", Vector4Equals_fn);
+
+    napi_value MatrixDeterminant_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixDeterminant, NULL, &MatrixDeterminant_fn);
+    napi_set_named_property(env, exports, "MatrixDeterminant", MatrixDeterminant_fn);
+
+    napi_value MatrixTrace_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixTrace, NULL, &MatrixTrace_fn);
+    napi_set_named_property(env, exports, "MatrixTrace", MatrixTrace_fn);
+
+    napi_value MatrixTranspose_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixTranspose, NULL, &MatrixTranspose_fn);
+    napi_set_named_property(env, exports, "MatrixTranspose", MatrixTranspose_fn);
+
+    napi_value MatrixInvert_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixInvert, NULL, &MatrixInvert_fn);
+    napi_set_named_property(env, exports, "MatrixInvert", MatrixInvert_fn);
+
+    napi_value MatrixIdentity_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixIdentity, NULL, &MatrixIdentity_fn);
+    napi_set_named_property(env, exports, "MatrixIdentity", MatrixIdentity_fn);
+
+    napi_value MatrixAdd_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixAdd, NULL, &MatrixAdd_fn);
+    napi_set_named_property(env, exports, "MatrixAdd", MatrixAdd_fn);
+
+    napi_value MatrixSubtract_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixSubtract, NULL, &MatrixSubtract_fn);
+    napi_set_named_property(env, exports, "MatrixSubtract", MatrixSubtract_fn);
+
+    napi_value MatrixMultiply_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixMultiply, NULL, &MatrixMultiply_fn);
+    napi_set_named_property(env, exports, "MatrixMultiply", MatrixMultiply_fn);
+
+    napi_value MatrixTranslate_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixTranslate, NULL, &MatrixTranslate_fn);
+    napi_set_named_property(env, exports, "MatrixTranslate", MatrixTranslate_fn);
+
+    napi_value MatrixRotate_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotate, NULL, &MatrixRotate_fn);
+    napi_set_named_property(env, exports, "MatrixRotate", MatrixRotate_fn);
+
+    napi_value MatrixRotateX_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotateX, NULL, &MatrixRotateX_fn);
+    napi_set_named_property(env, exports, "MatrixRotateX", MatrixRotateX_fn);
+
+    napi_value MatrixRotateY_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotateY, NULL, &MatrixRotateY_fn);
+    napi_set_named_property(env, exports, "MatrixRotateY", MatrixRotateY_fn);
+
+    napi_value MatrixRotateZ_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotateZ, NULL, &MatrixRotateZ_fn);
+    napi_set_named_property(env, exports, "MatrixRotateZ", MatrixRotateZ_fn);
+
+    napi_value MatrixRotateXYZ_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotateXYZ, NULL, &MatrixRotateXYZ_fn);
+    napi_set_named_property(env, exports, "MatrixRotateXYZ", MatrixRotateXYZ_fn);
+
+    napi_value MatrixRotateZYX_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixRotateZYX, NULL, &MatrixRotateZYX_fn);
+    napi_set_named_property(env, exports, "MatrixRotateZYX", MatrixRotateZYX_fn);
+
+    napi_value MatrixScale_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixScale, NULL, &MatrixScale_fn);
+    napi_set_named_property(env, exports, "MatrixScale", MatrixScale_fn);
+
+    napi_value MatrixFrustum_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixFrustum, NULL, &MatrixFrustum_fn);
+    napi_set_named_property(env, exports, "MatrixFrustum", MatrixFrustum_fn);
+
+    napi_value MatrixPerspective_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixPerspective, NULL, &MatrixPerspective_fn);
+    napi_set_named_property(env, exports, "MatrixPerspective", MatrixPerspective_fn);
+
+    napi_value MatrixOrtho_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixOrtho, NULL, &MatrixOrtho_fn);
+    napi_set_named_property(env, exports, "MatrixOrtho", MatrixOrtho_fn);
+
+    napi_value MatrixLookAt_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixLookAt, NULL, &MatrixLookAt_fn);
+    napi_set_named_property(env, exports, "MatrixLookAt", MatrixLookAt_fn);
+
+    napi_value MatrixToFloatV_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixToFloatV, NULL, &MatrixToFloatV_fn);
+    napi_set_named_property(env, exports, "MatrixToFloatV", MatrixToFloatV_fn);
+
+    napi_value QuaternionAdd_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionAdd, NULL, &QuaternionAdd_fn);
+    napi_set_named_property(env, exports, "QuaternionAdd", QuaternionAdd_fn);
+
+    napi_value QuaternionAddValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionAddValue, NULL, &QuaternionAddValue_fn);
+    napi_set_named_property(env, exports, "QuaternionAddValue", QuaternionAddValue_fn);
+
+    napi_value QuaternionSubtract_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionSubtract, NULL, &QuaternionSubtract_fn);
+    napi_set_named_property(env, exports, "QuaternionSubtract", QuaternionSubtract_fn);
+
+    napi_value QuaternionSubtractValue_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionSubtractValue, NULL, &QuaternionSubtractValue_fn);
+    napi_set_named_property(env, exports, "QuaternionSubtractValue", QuaternionSubtractValue_fn);
+
+    napi_value QuaternionIdentity_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionIdentity, NULL, &QuaternionIdentity_fn);
+    napi_set_named_property(env, exports, "QuaternionIdentity", QuaternionIdentity_fn);
+
+    napi_value QuaternionLength_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionLength, NULL, &QuaternionLength_fn);
+    napi_set_named_property(env, exports, "QuaternionLength", QuaternionLength_fn);
+
+    napi_value QuaternionNormalize_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionNormalize, NULL, &QuaternionNormalize_fn);
+    napi_set_named_property(env, exports, "QuaternionNormalize", QuaternionNormalize_fn);
+
+    napi_value QuaternionInvert_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionInvert, NULL, &QuaternionInvert_fn);
+    napi_set_named_property(env, exports, "QuaternionInvert", QuaternionInvert_fn);
+
+    napi_value QuaternionMultiply_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionMultiply, NULL, &QuaternionMultiply_fn);
+    napi_set_named_property(env, exports, "QuaternionMultiply", QuaternionMultiply_fn);
+
+    napi_value QuaternionScale_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionScale, NULL, &QuaternionScale_fn);
+    napi_set_named_property(env, exports, "QuaternionScale", QuaternionScale_fn);
+
+    napi_value QuaternionDivide_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionDivide, NULL, &QuaternionDivide_fn);
+    napi_set_named_property(env, exports, "QuaternionDivide", QuaternionDivide_fn);
+
+    napi_value QuaternionLerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionLerp, NULL, &QuaternionLerp_fn);
+    napi_set_named_property(env, exports, "QuaternionLerp", QuaternionLerp_fn);
+
+    napi_value QuaternionNlerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionNlerp, NULL, &QuaternionNlerp_fn);
+    napi_set_named_property(env, exports, "QuaternionNlerp", QuaternionNlerp_fn);
+
+    napi_value QuaternionSlerp_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionSlerp, NULL, &QuaternionSlerp_fn);
+    napi_set_named_property(env, exports, "QuaternionSlerp", QuaternionSlerp_fn);
+
+    napi_value QuaternionCubicHermiteSpline_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionCubicHermiteSpline, NULL, &QuaternionCubicHermiteSpline_fn);
+    napi_set_named_property(env, exports, "QuaternionCubicHermiteSpline", QuaternionCubicHermiteSpline_fn);
+
+    napi_value QuaternionFromVector3ToVector3_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionFromVector3ToVector3, NULL, &QuaternionFromVector3ToVector3_fn);
+    napi_set_named_property(env, exports, "QuaternionFromVector3ToVector3", QuaternionFromVector3ToVector3_fn);
+
+    napi_value QuaternionFromMatrix_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionFromMatrix, NULL, &QuaternionFromMatrix_fn);
+    napi_set_named_property(env, exports, "QuaternionFromMatrix", QuaternionFromMatrix_fn);
+
+    napi_value QuaternionToMatrix_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionToMatrix, NULL, &QuaternionToMatrix_fn);
+    napi_set_named_property(env, exports, "QuaternionToMatrix", QuaternionToMatrix_fn);
+
+    napi_value QuaternionFromAxisAngle_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionFromAxisAngle, NULL, &QuaternionFromAxisAngle_fn);
+    napi_set_named_property(env, exports, "QuaternionFromAxisAngle", QuaternionFromAxisAngle_fn);
+
+    napi_value QuaternionToAxisAngle_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionToAxisAngle, NULL, &QuaternionToAxisAngle_fn);
+    napi_set_named_property(env, exports, "QuaternionToAxisAngle", QuaternionToAxisAngle_fn);
+
+    napi_value QuaternionFromEuler_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionFromEuler, NULL, &QuaternionFromEuler_fn);
+    napi_set_named_property(env, exports, "QuaternionFromEuler", QuaternionFromEuler_fn);
+
+    napi_value QuaternionToEuler_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionToEuler, NULL, &QuaternionToEuler_fn);
+    napi_set_named_property(env, exports, "QuaternionToEuler", QuaternionToEuler_fn);
+
+    napi_value QuaternionTransform_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionTransform, NULL, &QuaternionTransform_fn);
+    napi_set_named_property(env, exports, "QuaternionTransform", QuaternionTransform_fn);
+
+    napi_value QuaternionEquals_fn;
+    napi_create_function(env, NULL, 0, BindNode_QuaternionEquals, NULL, &QuaternionEquals_fn);
+    napi_set_named_property(env, exports, "QuaternionEquals", QuaternionEquals_fn);
+
+    napi_value MatrixDecompose_fn;
+    napi_create_function(env, NULL, 0, BindNode_MatrixDecompose, NULL, &MatrixDecompose_fn);
+    napi_set_named_property(env, exports, "MatrixDecompose", MatrixDecompose_fn);
 
     return exports;
 }

@@ -13,17 +13,17 @@
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
-  BeginDrawing, 
-  EndDrawing, 
-  ClearBackground, 
-  DrawText, 
+import {
+  InitWindow,
+  CloseWindow,
+  BeginDrawing,
+  EndDrawing,
+  ClearBackground,
+  DrawText,
   DrawTexture,
   LoadTexture,
   UnloadTexture,
-  SetTargetFPS, 
+  SetTargetFPS,
   WindowShouldClose,
   RAYWHITE,
   WHITE,

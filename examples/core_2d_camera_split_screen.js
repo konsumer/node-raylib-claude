@@ -4,7 +4,7 @@
 *
 *   Example ported to JavaScript with node-raylib
 *
-*   Addapted from the core_3d_camera_split_screen example: 
+*   Addapted from the core_3d_camera_split_screen example:
 *       https://github.com/raysan5/raylib/blob/master/examples/core/core_3d_camera_split_screen.c
 *
 *   Example originally created with raylib 4.5, last time updated with raylib 4.5
@@ -18,9 +18,9 @@
 *
 ********************************************************************************************/
 
-import { 
-  InitWindow, 
-  CloseWindow, 
+import {
+  InitWindow,
+  CloseWindow,
   BeginDrawing,
   EndDrawing,
   ClearBackground,
@@ -90,11 +90,11 @@ const screenCamera1 = LoadRenderTexture(screenWidth/2, screenHeight)
 const screenCamera2 = LoadRenderTexture(screenWidth/2, screenHeight)
 
 // Build a flipped rectangle the size of the split view to use for drawing later
-const splitScreenRect = { 
-  x: 0.0, 
-  y: 0.0, 
-  width: screenCamera1.texture.width, 
-  height: -screenCamera1.texture.height 
+const splitScreenRect = {
+  x: 0.0,
+  y: 0.0,
+  width: screenCamera1?.texture?.width || 0,
+  height: -screenCamera1?.texture?.height || 0
 }
 
 SetTargetFPS(60)               // Set our game to run at 60 frames-per-second
@@ -123,22 +123,22 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
     //----------------------------------------------------------------------------------
     BeginTextureMode(screenCamera1)
         ClearBackground(RAYWHITE)
-        
+
         BeginMode2D(camera1)
-        
+
             // Draw full scene with first camera
             for (let i = 0; i < screenWidth/PLAYER_SIZE + 1; i++) {
                 DrawLineV(
-                    { x: PLAYER_SIZE*i, y: 0 }, 
-                    { x: PLAYER_SIZE*i, y: screenHeight }, 
+                    { x: PLAYER_SIZE*i, y: 0 },
+                    { x: PLAYER_SIZE*i, y: screenHeight },
                     LIGHTGRAY
                 )
             }
 
             for (let i = 0; i < screenHeight/PLAYER_SIZE + 1; i++) {
                 DrawLineV(
-                    { x: 0, y: PLAYER_SIZE*i }, 
-                    { x: screenWidth, y: PLAYER_SIZE*i }, 
+                    { x: 0, y: PLAYER_SIZE*i },
+                    { x: screenWidth, y: PLAYER_SIZE*i },
                     LIGHTGRAY
                 )
             }
@@ -152,30 +152,30 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
             DrawRectangleRec(player1, RED)
             DrawRectangleRec(player2, BLUE)
         EndMode2D()
-        
+
         DrawRectangle(0, 0, GetScreenWidth()/2, 30, Fade(RAYWHITE, 0.6))
         DrawText("PLAYER1: W/S/A/D to move", 10, 10, 10, MAROON)
-        
+
     EndTextureMode()
 
     BeginTextureMode(screenCamera2)
         ClearBackground(RAYWHITE)
-        
+
         BeginMode2D(camera2)
-        
+
             // Draw full scene with second camera
             for (let i = 0; i < screenWidth/PLAYER_SIZE + 1; i++) {
                 DrawLineV(
-                    { x: PLAYER_SIZE*i, y: 0 }, 
-                    { x: PLAYER_SIZE*i, y: screenHeight }, 
+                    { x: PLAYER_SIZE*i, y: 0 },
+                    { x: PLAYER_SIZE*i, y: screenHeight },
                     LIGHTGRAY
                 )
             }
 
             for (let i = 0; i < screenHeight/PLAYER_SIZE + 1; i++) {
                 DrawLineV(
-                    { x: 0, y: PLAYER_SIZE*i }, 
-                    { x: screenWidth, y: PLAYER_SIZE*i }, 
+                    { x: 0, y: PLAYER_SIZE*i },
+                    { x: screenWidth, y: PLAYER_SIZE*i },
                     LIGHTGRAY
                 )
             }
@@ -188,21 +188,21 @@ while (!WindowShouldClose())    // Detect window close button or ESC key
 
             DrawRectangleRec(player1, RED)
             DrawRectangleRec(player2, BLUE)
-            
+
         EndMode2D()
-        
+
         DrawRectangle(0, 0, GetScreenWidth()/2, 30, Fade(RAYWHITE, 0.6))
         DrawText("PLAYER2: UP/DOWN/LEFT/RIGHT to move", 10, 10, 10, DARKBLUE)
-        
+
     EndTextureMode()
 
     // Draw both views render textures to the screen side by side
     BeginDrawing()
         ClearBackground(BLACK)
-        
+
         DrawTextureRec(screenCamera1.texture, splitScreenRect, { x: 0, y: 0 }, WHITE)
         DrawTextureRec(screenCamera2.texture, splitScreenRect, { x: screenWidth/2.0, y: 0 }, WHITE)
-        
+
         DrawRectangle(GetScreenWidth()/2 - 2, 0, 4, GetScreenHeight(), LIGHTGRAY)
     EndDrawing()
 }

@@ -3,7 +3,7 @@
 import { writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { raylib as raylibJson } from '@raylib/api'
+import raylibJson from './api.js'
 
 const raylibVersion = raylibJson.defines.find(def => def.name === 'RAYLIB_VERSION').value
 
@@ -18,6 +18,7 @@ const bindings = require('./build/Release/node-raylib.node');
 export default bindings;
 
 // Add convenient aliases and property exports for commonly used types
+
 `
 
 // Generate export statements for each binding property
@@ -34,6 +35,10 @@ raylibJson.enums.forEach(enumDef => {
   enumDef.values.forEach(value => {
     jsCode += `export const ${value.name} = ${value.value};\n`
   })
+
+  if (enumDef.name === 'MaterialMapIndex') {
+    jsCode += `export const MATERIAL_MAP_DIFFUSE = 0;\n`
+  }
 })
 
 // Add common color constants
@@ -63,10 +68,6 @@ jsCode += `export const BEIGE = { r: 211, g: 176, b: 131, a: 255 };\n`
 jsCode += `export const BROWN = { r: 127, g: 106, b: 79, a: 255 };\n`
 jsCode += `export const DARKBROWN = { r: 76, g: 63, b: 47, a: 255 };\n`
 jsCode += `export const TRANSPARENT = { r: 0, g: 0, b: 0, a: 0 };\n`
-
-// Export the Color helper
-jsCode += `\n// Export Color helper function\n`
-jsCode += `export const Color = (r, g, b, a = 255) => ({ r, g, b, a });\n`
 
 // Write the generated code to file
 await writeFile(path.join(fileURLToPath(import.meta.url), '..', '..', 'index.js'), jsCode)

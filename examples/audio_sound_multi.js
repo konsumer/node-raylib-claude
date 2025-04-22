@@ -51,7 +51,7 @@ const MAX_SOUNDS = 10
 const soundArray = new Array(MAX_SOUNDS).fill(null)
 
 // load the sound list
-soundArray[0] = LoadSound("resources/sound.wav")         // Load WAV audio file into the first slot as the 'source' sound
+soundArray[0] = LoadSound("examples/resources/sound.wav")         // Load WAV audio file into the first slot as the 'source' sound
                                                         // this sound owns the sample data
 for (let i = 1; i < MAX_SOUNDS; i++) {
     soundArray[i] = LoadSoundAlias(soundArray[0])        // Load an alias of the sound into slots 1-9. These do not own the sound data, but can be played
